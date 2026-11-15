@@ -18,6 +18,7 @@
     "test:db": "node --test \"tests/db/**/*.test.mjs\"",
     "test:e2e": "playwright test",
     "db:migrate": "node scripts/db-migrate.mjs",
+    "ingest:preview": "tsx scripts/ingest-preview.ts",
     "ingest:backfill": "node -e \"console.error('Pending: ingestion is outside BASE scope');process.exit(1)\"",
     "stats:recompute": "node -e \"console.error('Pending: harmonization is outside BASE scope');process.exit(1)\""
   },
@@ -39,6 +40,7 @@
     "eslint-config-next": "^16.0.0",
     "prettier": "^3.6.0",
     "tailwindcss": "^4.1.0",
+    "tsx": "^4.23.15",
     "typescript": "~5.9.3",
     "vitest": "^4.0.0"
   }
