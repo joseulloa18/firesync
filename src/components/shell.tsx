@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Icon } from "./icon";
 import { dictionaries, sections, type Locale } from "./messages";
 
 export function Shell({
@@ -30,11 +31,11 @@ export function Shell({
       <a className="skip" href="#main">
         {t.skip}
       </a>
-      <header>
+      <header className="site-header">
         <div className="topbar">
           <Link className="brand" href={`/${locale}`}>
             <span className="brand-mark" aria-hidden="true">
-              ◉
+              <Icon name="flame" size={23} />
             </span>
             <span>
               {t.brand}
@@ -81,11 +82,21 @@ export function Shell({
       )}
       <main id="main">{children}</main>
       <footer>
-        <p className="footer-brand">{t.brand}</p>
-        <p>{t.footer}</p>
-        <p>{t.warning}</p>
-        <p>{t.attribution}</p>
-        <p>{t.emergency}</p>
+        <div>
+          <p className="footer-brand">
+            <Icon name="flame" size={20} />
+            {t.brand}
+          </p>
+          <p>{t.footer}</p>
+        </div>
+        <div>
+          <p>{t.warning}</p>
+          <p>{t.attribution}</p>
+        </div>
+        <div>
+          <p>{t.emergency}</p>
+          <p>{t.demoNotice}</p>
+        </div>
       </footer>
     </>
   );
