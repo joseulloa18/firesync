@@ -22,6 +22,7 @@
     "stats:recompute": "node -e \"console.error('Pending: harmonization is outside BASE scope');process.exit(1)\""
   },
   "dependencies": {
+    "maplibre-gl": "^6.18.0",
     "next": "^16.0.0",
     "pg": "^8.23.1",
     "react": "^19.2.0",
