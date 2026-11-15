@@ -1,0 +1,268 @@
+/*
+ * Historial v2: detalle mensual y diario.
+ * Solo estilos nuevos de esta tarea; globals.css y fire-map.css no se editan.
+ */
+
+.history-filter-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.history-filter-row .filter-grid {
+  flex: 1;
+  min-width: 0;
+}
+.history-csv-action {
+  flex: 0 0 auto;
+  padding-bottom: 1px;
+}
+.history-overview-note {
+  margin-top: 18px;
+}
+
+/* Meses futuros: rayado diagonal, además del símbolo ×. */
+.heat.is-future,
+.level-future {
+  border: 1px dashed rgba(111, 66, 35, 0.35);
+  background-image: repeating-linear-gradient(
+    135deg,
+    #f4e6da 0 5px,
+    #fff8f1 5px 10px
+  );
+  color: #8a6a55;
+}
+.heat.is-future {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+.heat.is-partial {
+  box-shadow: inset 0 0 0 2px #1f6784;
+}
+.legend .level-future {
+  display: inline-block;
+  width: 18px;
+  height: 11px;
+  border-radius: 4px;
+}
+.history-future-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.history-future-note .legend-future {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 15px;
+  border: 1px dashed rgba(111, 66, 35, 0.35);
+  border-radius: 4px;
+  background: #f4e6da;
+  color: #6c4a34;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.map-sample-note {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.history-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 24px;
+}
+.history-detail .month-panel-head {
+  gap: 18px;
+}
+.history-detail-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  gap: 10px;
+}
+.history-back-icon {
+  transform: rotate(180deg);
+}
+.history-detail .month-stat-grid {
+  margin-top: 0;
+}
+.history-detail .demo-note {
+  margin: 0;
+}
+.history-detail .helper {
+  margin-top: -4px;
+}
+
+.history-days-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+.history-days-head h3,
+.history-records-title {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 20px;
+}
+.history-days-head span {
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+.history-day-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.history-day {
+  display: flex;
+  width: 100%;
+  min-height: 54px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 7px 9px;
+  border: 1px solid var(--tan);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: left;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+.history-day:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--tan-strong);
+  box-shadow: 0 6px 12px rgba(112, 61, 28, 0.1);
+}
+.history-day[aria-pressed="true"] {
+  border-color: transparent;
+  outline: 2px solid #1f6784;
+  outline-offset: 1px;
+  background: #fff;
+}
+.history-day.is-empty {
+  background: var(--surface-soft);
+}
+.history-day.is-future {
+  cursor: not-allowed;
+  border-style: dashed;
+  background-image: repeating-linear-gradient(
+    135deg,
+    #f4e6da 0 5px,
+    #fff8f1 5px 10px
+  );
+  color: #8a6a55;
+  opacity: 0.8;
+}
+.history-day-number {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+.history-day-count {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+}
+.history-day.is-empty .history-day-count {
+  color: #b9a696;
+}
+.history-day.is-future .history-day-count {
+  font-family: inherit;
+  font-size: 15px;
+}
+
+.history-records-title {
+  margin-top: 4px;
+}
+.history-records-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--tan);
+  border-radius: 14px;
+}
+.history-records {
+  min-width: 760px;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 11.5px;
+}
+.history-records th,
+.history-records td {
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--tan);
+  text-align: left;
+  white-space: nowrap;
+}
+.history-records thead th {
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.history-records tbody tr:last-child td {
+  border-bottom: 0;
+}
+.history-records tbody th {
+  width: auto;
+}
+.sensor-tag.sensor-modis {
+  background: #ffe0c7;
+  color: #8f3200;
+}
+.sensor-tag.sensor-viirs {
+  background: #d7f0f5;
+  color: #15576b;
+}
+
+@media (max-width: 900px) {
+  .history-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .history-csv-action {
+    display: flex;
+    justify-content: flex-start;
+  }
+  .history-detail .month-panel-head {
+    flex-direction: column;
+  }
+  .history-detail-actions {
+    width: 100%;
+  }
+  .history-day-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .history-day-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .history-day {
+    min-height: 48px;
+  }
+  .history-day-count {
+    font-size: 17px;
+  }
+  .history-detail {
+    padding: 18px;
+  }
+}
