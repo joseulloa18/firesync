@@ -1,8 +1,9 @@
 # Estación de Jose
 
 Cuenta GitHub: **Josezx18**. Estación: `mac-jose`.
-Lee [TAREA-ACTUAL.md](TAREA-ACTUAL.md): OpenCode conserva la tarea #16;
-el Codex de la PC adicional tiene la tarea #38 en otra carpeta.
+Prioridad: Codex en la Mac es responsable del frente de APIs reales [#40](https://github.com/joseulloa18/firesync/issues/40).
+Lee [TAREA-ACTUAL.md](TAREA-ACTUAL.md). #16 y #38 están en espera.
+Este frente se abre en Codex; el lanzador de abajo sigue siendo de OpenCode.
 
 Descarga y descomprime [FIRESYNC-Jose.zip](https://github.com/joseulloa18/firesync/releases/download/estaciones-v1/FIRESYNC-Jose.zip).
 Ejecuta INICIAR.bat (Windows) o INICIAR.command (Mac). Conserva todos los archivos de esta carpeta.
