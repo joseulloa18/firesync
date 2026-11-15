@@ -19,3 +19,7 @@ Corte de esta tanda: Fase 0 y componentes independientes de Fase 1; integración
 - OpenCode: ses_e236a5322ffeE7YW0Z7GlM4bqQ; tarea esquema.
 - Directorios separados: C:/Users/Josex/.codex/worktrees/nasa-base/Nasa app challenge, nasa-datos/Nasa app challenge y nasa-esquema/Nasa app challenge.
 - GitHub Josezx18 solo detectado; NO es la cuenta autorizada para publicar. Cuenta destino asociada al correo institucional del operador; pendiente de identificar usuario y miembros.
+
+## Nombre del producto
+FIRESYNC. Repositorio privado: https://github.com/joseulloa18/firesync.
+El usuario aún debe completar la autenticación de GitHub CLI para publicar desde esta máquina.
