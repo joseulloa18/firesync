@@ -14,12 +14,14 @@ about: Trabajo aislado para una sesión de agente
 ## Verificación
 
 ## Asignación
+
 Operador:
 Estación:
 Agente y sesión:
 Rama / worktree:
 
 ## Relevo
+
 Avance publicado:
 Pendiente:
 Pruebas ejecutadas:
