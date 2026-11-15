@@ -41,6 +41,16 @@ local `firesync_test`; en otros entornos se omite sin abrir una conexión. Todos
 los fixtures se insertan dentro de transacciones que terminan en rollback.
 No equivale a verificar las credenciales o configuración del proyecto remoto.
 
+La comprobación de PostGIS del [PR #51](https://github.com/joseulloa18/firesync/pull/51)
+ya ejecutó correctamente estas pruebas contra PostgreSQL efímero, incluidos los
+roles autenticados. Durante la revisión general también se corrigió el selector
+de zona de Prevención/Respuesta: permanece deshabilitado en el HTML inicial
+hasta terminar de hidratarse, de modo que no pierde cambios o foco durante el
+arranque. La prueba espera el estado habilitado y selecciona «Sector sur» con
+teclado, conservando la comprobación de foco y descarga. No modifica datos,
+recursos ni el diseño. Referencia:
+[hidratación en Playwright](https://playwright.dev/docs/navigations#hydration).
+
 ## Orden de activación cuando estén conectadas las cuentas
 
 1. Confirmar la cuenta y el proyecto Supabase FIRESYNC previsto en `AGENTS.md`
@@ -91,3 +101,8 @@ no degrada el almacenamiento de producción a memoria.
 
 Estado de activación: pendiente de conexiones verificadas. No hay evidencia de
 que las variables o tablas hayan sido configuradas en producción por esta etapa.
+
+Verificación local de la preparación: `pnpm lint`, `pnpm typecheck`, `pnpm build`,
+340 pruebas unitarias y los 48 casos de navegador pasan. Los nueve controles
+estáticos de base pasan y la prueba SQL se omite localmente; su ejecución real
+con PostgreSQL efímero pasó en el workflow de PostGIS del PR #51.

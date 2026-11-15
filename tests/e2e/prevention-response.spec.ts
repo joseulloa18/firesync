@@ -66,13 +66,15 @@ test("zone selector is keyboard accessible and the sheet downloads", async ({
   await page.goto("/es/prevencion?zona=north");
   const select = page.getByTestId("zone-select");
   await expect(select).toHaveValue("north");
+  await expect(select).toBeEnabled();
 
   if (isMobile) {
     // Mobile native pickers do not commit selection with desktop arrow keys.
     await select.selectOption("south");
   } else {
-    await select.focus();
-    await page.keyboard.press("ArrowDown");
+    // Type-ahead selects "Sector sur" without relying on native popup arrows.
+    await select.press("s");
+    await expect(select).toBeFocused();
   }
   await expect(select).toHaveValue("south");
 
