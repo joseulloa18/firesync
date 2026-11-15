@@ -105,7 +105,8 @@ cuerpo de una respuesta externa. Tampoco se adjunta el error original de
 `fetch` como `cause`. Para diagnosticar un fallo, usa `code`, `status` y
 `attempts`, no el texto del servidor.
 
-Las peticiones que no son `200` no leen el cuerpo de la respuesta.
+Las peticiones que no son `200` no leen el cuerpo de la respuesta: lo cancelan
+sin consumirlo para liberar la conexión y permitir su reutilización.
 
 ## Pruebas
 

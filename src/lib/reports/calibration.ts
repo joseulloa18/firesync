@@ -217,24 +217,26 @@ export function buildCalibrationReport(
   const reportMonths: CalibrationReportMonth[] = [...months]
     .sort((left, right) => monthOrdinal(left) - monthOrdinal(right))
     .map((month) => {
+      // Match the calibration rules: NaN, Infinity and negatives are not
+      // observations, so they are reported as absent instead of leaking into
+      // the monthly series or the CSV as invalid numbers.
+      const modisCellDays = isValidValue(month.modisCellDays)
+        ? month.modisCellDays
+        : null;
+      const viirsCellDays = isValidValue(month.viirsCellDays)
+        ? month.viirsCellDays
+        : null;
       const scaled =
-        factor !== null &&
-        month.viirsCellDays !== null &&
-        Number.isFinite(month.viirsCellDays)
-          ? factor * month.viirsCellDays
+        factor !== null && viirsCellDays !== null
+          ? factor * viirsCellDays
           : null;
       const residual =
-        scaled !== null &&
-        month.modisCellDays !== null &&
-        Number.isFinite(month.modisCellDays)
-          ? scaled - month.modisCellDays
+        scaled !== null && modisCellDays !== null
+          ? scaled - modisCellDays
           : null;
       const relativeError =
-        residual !== null &&
-        month.modisCellDays !== null &&
-        Number.isFinite(month.modisCellDays) &&
-        month.modisCellDays > 0
-          ? residual / month.modisCellDays
+        residual !== null && modisCellDays !== null && modisCellDays > 0
+          ? residual / modisCellDays
           : null;
 
       return {
@@ -242,13 +244,13 @@ export function buildCalibrationReport(
         month: month.month,
         period: periodLabel(month.year, month.month),
         isPartial: month.isPartial === true,
-        modisCellDays: month.modisCellDays,
-        viirsCellDays: month.viirsCellDays,
+        modisCellDays,
+        viirsCellDays,
         viirsScaledCellDays: scaled,
         residual,
         relativeError,
-        modisState: reportValueState(month.modisCellDays),
-        viirsState: reportValueState(month.viirsCellDays),
+        modisState: reportValueState(modisCellDays),
+        viirsState: reportValueState(viirsCellDays),
       };
     });
 
@@ -286,7 +288,12 @@ function escapeCsvField(value: string | number | boolean | null): string {
   if (value === null) {
     return "";
   }
-  const text = String(value);
+  let text = String(value);
+  // Spreadsheet programs can execute text cells starting with these characters
+  // as formulas. Prefix them with an apostrophe; numeric values are untouched.
+  if (typeof value === "string" && /^[=+\-@\t\r]/.test(text)) {
+    text = `'${text}`;
+  }
   if (/[",\r\n]/.test(text) || /^[ \t]|[ \t]$/.test(text)) {
     return `"${text.replace(/"/g, '""')}"`;
   }

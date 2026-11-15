@@ -81,6 +81,16 @@ const defaultSleep: FirmsSleep = (milliseconds, signal) =>
     signal?.addEventListener("abort", onAbort, { once: true });
   });
 
+async function cancelResponseBody(response: Response): Promise<void> {
+  if (response.body === null) return;
+  try {
+    // Drain the stream without reading it so the connection can be reused.
+    await response.body.cancel();
+  } catch {
+    // A locked or already consumed body cannot be cancelled; ignore it.
+  }
+}
+
 function waitForAbortable<T>(
   promise: Promise<T>,
   signal: AbortSignal | undefined,
@@ -293,12 +303,14 @@ export class FirmsClient {
         return { kind: "success", csv };
       }
 
+      const retryAfterMs = isRetryableStatus(response.status)
+        ? parseRetryAfterMs(response.headers.get("retry-after"), this.now())
+        : null;
+      await cancelResponseBody(response);
       return {
         kind: "http",
         status: response.status,
-        retryAfterMs: isRetryableStatus(response.status)
-          ? parseRetryAfterMs(response.headers.get("retry-after"), this.now())
-          : null,
+        retryAfterMs,
       };
     } catch (error: unknown) {
       if (error instanceof FirmsClientError) throw error;

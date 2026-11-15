@@ -195,6 +195,72 @@ describe("calibration report", () => {
     });
   });
 
+  it("reports non-finite and negative monthly values as absent, never as numbers", () => {
+    const report = buildCalibrationReport(
+      months([
+        [2012, 1, Number.NaN, 5],
+        [2012, 2, -2, 5],
+        [2012, 3, 10, Number.POSITIVE_INFINITY],
+        [2012, 4, 10, 5],
+      ]),
+      synthetic,
+    );
+
+    expect(report.status).toBe("ok");
+    expect(report.factor).toBe(2);
+    expect(report.nOverlapMonths).toBe(1);
+    expect(report.months[0]).toMatchObject({
+      modisCellDays: null,
+      modisState: "absent",
+      viirsCellDays: 5,
+      viirsScaledCellDays: 10,
+      residual: null,
+      relativeError: null,
+    });
+    expect(report.months[1]).toMatchObject({
+      modisCellDays: null,
+      modisState: "absent",
+    });
+    expect(report.months[2]).toMatchObject({
+      modisCellDays: 10,
+      viirsCellDays: null,
+      viirsState: "absent",
+      viirsScaledCellDays: null,
+      residual: null,
+    });
+    expect(report.months[3]).toMatchObject({
+      modisCellDays: 10,
+      viirsCellDays: 5,
+      viirsScaledCellDays: 10,
+      residual: 0,
+    });
+
+    const csv = calibrationReportToCsv(report);
+    expect(csv).not.toMatch(/NaN|Infinity/);
+    expect(csv).not.toContain(",-2,");
+  });
+
+  it("neutralizes spreadsheet formulas in text fields but keeps numeric signs", () => {
+    const formula = buildCalibrationReport(months([[2012, 1, 10, 5]]), {
+      ...synthetic,
+      label: '=HYPERLINK("https://example.test")',
+    });
+    expect(calibrationReportToCsv(formula)).toContain(
+      `"'=HYPERLINK(""https://example.test"")",synthetic,true,ok,`,
+    );
+
+    const negative = buildCalibrationReport(
+      months([
+        [2012, 1, 100, 1],
+        [2012, 2, 1, 100],
+      ]),
+      synthetic,
+    );
+    expect(calibrationReportToCsv(negative)).toContain(
+      ",2012-01,2012,1,false,100,1,1,-99,",
+    );
+  });
+
   it("marks the origin explicitly as observed or synthetic", () => {
     const observed = buildCalibrationReport(months([[2012, 1, 10, 5]]), {
       origin: "observed",

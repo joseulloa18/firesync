@@ -328,6 +328,23 @@ describe("FIRMS area CSV client", () => {
     expect(renderError(error)).not.toContain("bad request body");
   });
 
+  it("cancels non-200 response bodies without reading them", async () => {
+    const cancel = vi.fn(async () => undefined);
+    const response = {
+      status: 503,
+      headers: new Headers(),
+      body: { cancel },
+    } as unknown as Response;
+    const fetchMock = vi.fn(async () => response);
+    const client = makeClient(fetchMock, { maxRetries: 0 });
+
+    const error = await getError(client.download(REQUEST));
+
+    expect(error.code).toBe("http_status");
+    expect(error.status).toBe(503);
+    expect(cancel).toHaveBeenCalledTimes(1);
+  });
+
   it("does not leak fetch errors containing the URL or map key", async () => {
     const fullUrl = `${FIRMS_AREA_CSV_BASE_URL}/${MAP_KEY}/VIIRS_SNPP_NRT/-72.6,17,-67.7,20.6/2`;
     const fetchMock = vi.fn(async () => {

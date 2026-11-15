@@ -73,6 +73,12 @@ Los meses parciales se excluyen de la calibración salvo que se pida
 aparecen en `months` con su etiqueta `isPartial`, para que el lector vea por qué
 no cuentan.
 
+Un valor no finito (`NaN`, `Infinity`) o negativo no es una observación válida.
+El informe lo trata como ausente (`null`, `modisState`/`viirsState: 'absent'`),
+igual que la calibración, y nunca lo escribe como `NaN`, `Infinity` o negativo.
+Por eso la serie mensual no puede contradecir los meses que entraron en el
+factor.
+
 Un mes con una sola familia observada no entra en la calibración, pero sí se
 muestra en la serie mensual. Su VIIRS escalado se calcula si hay factor, y su
 residual/error relativo quedan `null` porque falta el otro lado del par.
@@ -117,6 +123,9 @@ Reglas de escape:
 
 - campos con coma, comilla, CR/LF o espacios al inicio/fin se entrecomillan;
 - las comillas internas se duplican (`"` → `""`);
+- los campos de texto que empiezan con `=`, `+`, `-`, `@`, tabulación o CR se
+  prefijan con `'` para que una hoja de cálculo no los ejecute como fórmula; los
+  números negativos legítimos (residual, error relativo) no se alteran;
 - `null` se escribe como campo vacío y `0` se escribe como `0`, por lo que
   ausencia y cero no se confunden al reabrir el archivo;
 - los valores de las líneas de comentario se convierten a una sola línea.
