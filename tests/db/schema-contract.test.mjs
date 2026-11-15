@@ -113,6 +113,10 @@ test("service_role escribe solo si existe y public no gana escritura", () => {
   );
   assert.match(
     sql,
+    /grant usage on schema public, extensions to service_role/i,
+  );
+  assert.match(
+    sql,
     /grant insert, update, delete on table[\s\S]*?to service_role/i,
   );
   assert.match(

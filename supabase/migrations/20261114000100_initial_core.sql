@@ -205,6 +205,7 @@ grant select on public.region_month_stats to public;
 do $$
 begin
   if exists (select 1 from pg_catalog.pg_roles where rolname = 'service_role') then
+    execute 'grant usage on schema public, extensions to service_role';
     execute 'grant insert, update, delete on table
       public.regions, public.grid_cells, public.raw_detections,
       public.cell_day_occupancy, public.cell_month,

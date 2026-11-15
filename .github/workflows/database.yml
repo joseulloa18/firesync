@@ -27,6 +27,15 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Simular PostGIS en extensions (solo DB efímera)
+        run: |
+          node --input-type=module -e '
+          import { Client } from "pg";
+          const client = new Client({ connectionString: process.env.DATABASE_URL });
+          await client.connect();
+          await client.query("drop extension if exists postgis cascade");
+          await client.end();
+          '
       - name: Crear roles de prueba
         run: |
           node --input-type=module -e '

@@ -30,6 +30,7 @@ async function detection([source, satellite, cellId, lon, lat, at]) {
 
 async function main() {
   await client.connect();
+  await client.query("set search_path = public, extensions");
   await client.query("begin");
   try {
     const region = await client.query(
