@@ -1,7 +1,8 @@
 # Estación de Ian
 
 Cuenta GitHub: **NunezIan**. Estación: `pc-2-ian`.
-Tarea inicial: [issue #14](https://github.com/joseulloa18/firesync/issues/14).
+Tarea vigente: [issue #35](https://github.com/joseulloa18/firesync/issues/35).
+Lee [TAREA-ACTUAL.md](TAREA-ACTUAL.md) antes de ejecutar. Las tareas #14 y #21 ya terminaron.
 
 Descarga y descomprime [FIRESYNC-Ian.zip](https://github.com/joseulloa18/firesync/releases/download/estaciones-v1/FIRESYNC-Ian.zip).
 Ejecuta INICIAR.bat (Windows) o INICIAR.command (Mac). Conserva todos los archivos de esta carpeta.

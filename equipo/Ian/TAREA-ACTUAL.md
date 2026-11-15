@@ -1,7 +1,8 @@
 # Tarea actual de Ian
 
 El historial #21 ya está integrado en PR #26. La siguiente tarea lista es la
-vista previa de ingesta local (consulta tus issues abiertos worker:ready).
+vista previa de ingesta local [#35](https://github.com/joseulloa18/firesync/issues/35).
+Rama: `hackathon/issue-35`, base `main` actualizada. Usa OpenCode y una carpeta propia.
 No modifica el mapa de Yariel ni la procedencia que implementa apoyo central.
 
 Ejecuta INICIAR para recoger la nueva tanda. Solo los archivos del issue,
