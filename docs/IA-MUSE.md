@@ -7,7 +7,8 @@ adelantando esta entrega respecto a la condición previa de fases 0–6. Despué
 aclaró que dispone de una API de Meta: se elige **Meta Model API directa**, no
 NVIDIA ni Baseten. Esto no acredita la aceptación de las fases pendientes.
 
-Carpeta propia: `FIRESYNC-ia`; rama `codex/ia-muse`, base `5a092a1`. Se conserva
+Carpeta propia: `FIRESYNC-ia`; rama `codex/ia-muse`, actualizada sobre `main`
+`effb3ce` antes de publicar. Se conserva
 intacta la rama documental `codex/api-plan` y el worktree de NASA.
 
 Esta entrega implementa el perfil `support-chat`: adaptador real y mock,
@@ -223,15 +224,16 @@ Reversión local: volver a `LLM_PROVIDER=mock` con `DEMO_MODE=true` corta llamad
 a Meta; retirar los dos añadidos del layout elimina el acceso visual. La
 reversión de código no borra registros ni requiere deshacer automáticamente la
 migración. La publicación de rama/PR y la integración a `main` quedan al operador
-y coordinación, según `AGENTS.md`; no se hace push ni merge desde esta sesión.
+y coordinación, según `AGENTS.md`. El usuario autorizó explícitamente publicar
+esta rama y su PR; la integración a `main` conserva la revisión de coordinación.
 
 ### Evidencia local de esta entrega — 2026-11-15
 
-- `pnpm install --frozen-lockfile`: completó los 429 paquetes con Corepack y
+- `pnpm install --frozen-lockfile`: completó la instalación con Corepack y
   pnpm 10.32.1, sin cambios de dependencias ni lockfile. Se resolvieron los
   bloqueos previos de red y paquetes del mapa.
 - `pnpm lint`: pasó (ESLint y Prettier).
-- `pnpm test`: **227 pruebas, 21 archivos**, todas pasando; 40 pruebas nuevas
+- `pnpm test`: **340 pruebas, 26 archivos**, todas pasando; 40 pruebas nuevas
   de IA. Cubren contrato Meta, fragmentación UTF-8/SSE, errores saneados,
   herramientas/política, sesiones ajenas, cuotas, cancelación, límites,
   fallback y transporte de auditoría/lecturas Supabase simulado.
@@ -239,11 +241,15 @@ y coordinación, según `AGENTS.md`; no se hace push ni merge desde esta sesión
 - `pnpm build`: pasó con Turbopack, sin omitir TypeScript, en modo mock/demo.
   Generó las páginas ES/EN y `/api/agent/chat`. No requiere invocar a Meta
   durante la compilación.
-- `pnpm test:e2e --workers=2`: **32 casos pasando**, escritorio y móvil, incluidos
-  streaming demo del asistente, mensajes de error en inglés y navegación
-  existente. El selector de error del asistente se acotó a su región para no
-  confundirlo con el anunciador de rutas de Next.js. Estos casos usan mock;
-  no consumen tokens de Meta.
+- `pnpm test:e2e --workers=2`: **47 de 48 casos pasando** sobre la base actual,
+  incluidos los cuatro casos del asistente en escritorio y móvil. El caso de
+  Prevención que usa `ArrowDown` en un selector nativo no confirmó el cambio de
+  zona en Chromium/macOS; se conserva la prueba del equipo y se registra este
+  límite local para contrastarlo con CI. El selector de error del asistente se
+  acotó a su región para no confundirlo con el anunciador de rutas de Next.js.
+  Estos casos usan mock; no consumen tokens de Meta.
+- `pnpm test:db`: pasaron los nueve controles estáticos existentes del esquema
+  y runner. No aplican SQL ni prueban la nueva RLS del agente contra una base.
 - La migración SQL se entrega para revisión; **no aplicada ni validada contra
   PostgreSQL real** en esta sesión. Los tests de transporte simulado no se
   presentan como una prueba de RLS en una base de datos.
