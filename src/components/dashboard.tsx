@@ -925,6 +925,10 @@ export function RecentDashboard({
           mode="recent"
           records={visible}
           sensor={sensor}
+          onSensorChange={(nextSensor) => {
+            setSensor(nextSensor);
+            setSelected(null);
+          }}
           onSelect={setSelected}
         />
 

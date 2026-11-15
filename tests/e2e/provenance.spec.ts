@@ -20,4 +20,8 @@ test("Actualidad shows a readable provenance block and follows sensor filters", 
   await page.getByLabel("Sensor").selectOption("VIIRS");
   await expect(newest).not.toHaveText(allSensors ?? "");
   await expect(block).toContainText("adquisición sintética");
+
+  await page.getByRole("button", { name: "MODIS", exact: true }).click();
+  await expect(page.getByLabel("Sensor")).toHaveValue("MODIS");
+  await expect(newest).toHaveText(allSensors ?? "");
 });
