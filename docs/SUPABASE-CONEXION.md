@@ -108,10 +108,33 @@ Verificación local de esta entrega: `pnpm lint` y `pnpm typecheck` pasan;
 21 pruebas y omite una porque el PostGIS efímero solo está disponible en CI.
 La sintaxis del lanzador y `git diff --check` también pasan.
 
-**Estado de conexión real: pendiente.** No hay `DATABASE_URL` configurada en la
-Mac para esta etapa y no se ha realizado una lectura del proyecto remoto.
-No confundir el cliente simulado o el PostGIS efímero de CI con ese proyecto.
-Al disponer del acceso, guardar evidencia saneada de fecha UTC, commit,
+### Comprobación real de la API pública — 2026-11-15
+
+El operador proporcionó la URL de su proyecto y una clave publicable. Se
+guardaron únicamente en el `.env.local` ignorado por Git, con los nombres
+`NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+La clave publicable identifica el componente de aplicación y aplica los
+permisos/RLS de `anon` sin sesión de usuario, según la
+[documentación oficial](https://supabase.com/docs/guides/api/api-keys).
+No es una contraseña PostgreSQL ni sustituye a `DATABASE_URL`.
+
+Desde esta sesión se comprobaron por HTTPS las siete tablas y las dos vistas
+de las listas fijas de esta herramienta. Cada consulta usó exclusivamente
+`HEAD /rest/v1/{nombre}?select=*&limit=0`, con la clave en `apikey`, sin cookies,
+sin redirecciones y con timeout. Los nueve objetos respondieron HTTP 200.
+La clave no se utilizó como JWT en el encabezado `Authorization`.
+
+Esto acredita conectividad y acceso de lectura a esos endpoints públicos.
+La consulta estaba limitada a cero filas: no mide cuántas observaciones hay,
+no demuestra ausencia de actividad ni verifica el aislamiento entre usuarios.
+No se consultaron endpoints privados ni se intentó escribir con esa clave.
+La aplicación no cambia automáticamente de demo por esta comprobación.
+
+**Estado de la comprobación SQL real: pendiente.** No hay `DATABASE_URL`
+configurada en la Mac para esta etapa. El acceso público REST no acredita
+las versiones PostGIS/pgcrypto, configuración SQL de RLS ni checksums del ledger
+restringido. Tampoco lo acreditan el cliente simulado o el PostGIS efímero de CI.
+Al disponer del acceso SQL, guardar evidencia saneada de fecha UTC, commit,
 comprobaciones y resultado; nunca incluir la cadena ni su contraseña.
 
 Antes de avanzar a persistencia, revisar el resultado real con coordinación.
