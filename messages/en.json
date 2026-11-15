@@ -1,5 +1,5 @@
 {
-  "brand": "FIRESYNC",
+  "brand": "FireSync",
   "tagline": "FIRE CALENDAR",
   "nav": {
     "home": "Home",
@@ -173,6 +173,11 @@
     "list": "View sample detections",
     "noData": "No detections match this filter.",
     "north": "Reset bearing to north",
-    "attributionToggle": "Show map attribution"
+    "attributionToggle": "Show map attribution",
+    "activityUnit": "Synthetic detections per cell",
+    "all": "Both sensors",
+    "terrain": "Terrain",
+    "activity": "Detected activity",
+    "terrainUnavailable": "Terrain could not load. The flat map remains available."
   }
 }

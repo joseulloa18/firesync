@@ -1,5 +1,5 @@
 {
-  "brand": "FIRESYNC",
+  "brand": "FireSync",
   "tagline": "CALENDARIO DE FUEGO",
   "nav": {
     "home": "Inicio",
@@ -173,6 +173,11 @@
     "list": "Ver detecciones de ejemplo",
     "noData": "No hay detecciones para este filtro.",
     "north": "Restablecer orientación al norte",
-    "attributionToggle": "Mostrar atribución del mapa"
+    "attributionToggle": "Mostrar atribución del mapa",
+    "activityUnit": "Detecciones sintéticas por celda",
+    "all": "Ambos sensores",
+    "terrain": "Relieve",
+    "activity": "Actividad detectada",
+    "terrainUnavailable": "No se pudo cargar el relieve. Se mantiene el mapa plano."
   }
 }
