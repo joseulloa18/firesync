@@ -1,0 +1,20 @@
+{
+  "area": "República Dominicana y alrededores (área de consulta)",
+  "available": "Últimos días disponibles por producto (máximo 7)",
+  "observed": "Observaciones reales · no confirmaciones de incendio",
+  "intro": "Consulta observaciones de NASA FIRMS. Las fechas disponibles pueden ser anteriores a hoy; revisa el período de cada producto.",
+  "provenance": "Fuente y disponibilidad real",
+  "downloaded": "Última descarga del servidor",
+  "records": "registros",
+  "unavailable": "No disponible",
+  "partial": "Consulta incompleta: hay productos que no se pudieron descargar. No interpretes su ausencia como cero actividad.",
+  "limits": "Consulta de solo lectura, caché de 15 minutos y sin ingesta persistente. Área rectangular, no límite administrativo. Cobertura satelital no evaluada; historial y otras vistas pueden seguir en demostración.",
+  "emptyWarning": "Cero registros significa que esta consulta no devolvió detecciones; no demuestra ausencia de incendios. Los filtros de 24 horas, 3 y 7 días se calculan desde la descarga, no desde un dato antiguo.",
+  "map": "Mapa de observaciones FIRMS",
+  "list": "Detecciones del filtro",
+  "attribution": "NASA FIRMS · observaciones satelitales |",
+  "unit": "Detecciones por celda",
+  "empty": "Sin detecciones devueltas para este filtro y los productos consultados.",
+  "failed": "No se pudo consultar NASA FIRMS. No se muestran datos sintéticos como alternativa.",
+  "displayLimit": "La lista muestra hasta 200 registros y el mapa hasta 250 marcadores. La intensidad usa todos los registros del filtro."
+}

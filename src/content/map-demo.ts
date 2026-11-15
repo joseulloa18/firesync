@@ -2,12 +2,18 @@ export type DemoSensor = "MODIS" | "VIIRS";
 export type DemoSensorFilter = "all" | DemoSensor;
 export type DemoMode = "history" | "recent" | "preview";
 
-export type DemoDetection = {
+export type MapDetection = {
   id: string;
   sensor: DemoSensor;
   satellite: string;
   acquiredAt: string;
   coordinates: [number, number];
+  confidence: number | string | null;
+  frpMw: number | null;
+  is_demo: boolean;
+};
+
+export type DemoDetection = MapDetection & {
   confidence: number;
   frpMw: number;
   is_demo: true;
@@ -300,7 +306,7 @@ export type DemoFilter = {
 };
 
 function matchesFilter(
-  item: DemoDetection,
+  item: MapDetection,
   sensor: DemoSensorFilter,
   day: number | undefined,
 ) {
@@ -327,17 +333,17 @@ export function filterDemoDetections({
 }
 
 /** Supplied records keep their exact membership and order; only sensor/day filter. */
-export function filterDetectionRecords(
-  detections: readonly DemoDetection[],
+export function filterDetectionRecords<T extends MapDetection>(
+  detections: readonly T[],
   { sensor = "all", day }: { sensor?: DemoSensorFilter; day?: number } = {},
-): DemoDetection[] {
+): T[] {
   return detections.filter((item) => matchesFilter(item, sensor, day));
 }
 
 export type DemoBounds = [[number, number], [number, number]];
 
 export function getDetectionBounds(
-  detections: readonly DemoDetection[],
+  detections: readonly MapDetection[],
 ): DemoBounds | null {
   let minLng = Number.POSITIVE_INFINITY;
   let minLat = Number.POSITIVE_INFINITY;

@@ -13,7 +13,7 @@ import {
   filterDemoDetections,
   filterDetectionRecords,
   getDetectionBounds,
-  type DemoDetection,
+  type MapDetection,
   type DemoMode,
   type DemoSensor,
   type DemoSensorFilter,
@@ -54,7 +54,7 @@ export type FireMapLabels = {
 
 export type FireMapProps = {
   labels: FireMapLabels;
-  detections?: readonly DemoDetection[];
+  detections?: readonly MapDetection[];
   mode?: DemoMode;
   sensor?: DemoSensorFilter;
   /** Optional controlled sensor filter. Without it the map keeps local state. */
@@ -62,7 +62,7 @@ export type FireMapProps = {
   /** Spatial activity layer. Defaults to true for history mode only. */
   activity?: boolean;
   day?: number;
-  onSelect?: (detection: DemoDetection) => void;
+  onSelect?: (detection: MapDetection) => void;
 };
 
 type MapModule = typeof import("maplibre-gl");
@@ -90,7 +90,7 @@ const AOI_FILL_LAYER = "demo-aoi-fill";
 
 function fitToDetections(
   map: MapLibreMap | null,
-  detections: readonly DemoDetection[],
+  detections: readonly MapDetection[],
 ) {
   const bounds = getDetectionBounds(detections);
   if (!map || !bounds) return false;
@@ -379,7 +379,7 @@ export function FireMap({
     }
   }, [labels, status]);
 
-  const selectDetection = useCallback((detection: DemoDetection) => {
+  const selectDetection = useCallback((detection: MapDetection) => {
     setSelectedId(detection.id);
     onSelectRef.current?.(detection);
   }, []);
