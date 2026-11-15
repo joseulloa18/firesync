@@ -2,7 +2,9 @@
 
 Etapa del frente [#40](https://github.com/joseulloa18/firesync/issues/40), después
 de las pruebas NASA. Rama `codex/supabase-readonly-check`, carpeta
-`FIRESYNC-supabase`, base `main` `effb3ce`. Los archivos nuevos de esta etapa se
+`FIRESYNC-supabase`, base inicial `main` `effb3ce`, sincronizada después con
+`48dafbd` para incluir la migración de IA ya integrada por coordinación.
+Los archivos nuevos de esta etapa se
 [registraron en coordinación](https://github.com/joseulloa18/firesync/issues/40#issuecomment-6899300136).
 
 ## Preparar la conexión
@@ -104,7 +106,8 @@ contra el PostGIS efímero del workflow existente: solo se habilita con
 se utiliza en la CLI de producción y no verifica TLS de Supabase.
 
 Verificación local de esta entrega: `pnpm lint` y `pnpm typecheck` pasan;
-`pnpm test` pasa con 22 archivos y 300 pruebas; `pnpm test:db` pasa con
+`pnpm test` pasa con 26 archivos y 340 pruebas sobre la base actualizada;
+`pnpm test:db` pasa con
 21 pruebas y omite una porque el PostGIS efímero solo está disponible en CI.
 La sintaxis del lanzador y `git diff --check` también pasan.
 
