@@ -3,6 +3,23 @@ import { test, expect } from "@playwright/test";
 const DETECTION_QUERY =
   "zona=south&deteccion=demo-viirs-01&lat=18.78&lon=-70.53&sensor=VIIRS&satelite=S-NPP&adquirido=2025-03-04T17%3A45%3A00.000Z";
 
+test("Actualidad opens response with the selected known record", async ({
+  page,
+}) => {
+  await page.goto("/es/actualidad");
+  await page.getByRole("button", { name: "VIIRS", exact: true }).click();
+  await page
+    .getByRole("link", { name: "Ver canales de respuesta", exact: true })
+    .click();
+  const card = page.getByTestId("response-detection");
+  await expect(card).toContainText("demo-viirs-002");
+  await expect(card).toContainText("[-70.412, 18.735]");
+  await expect(card).toContainText(
+    "Una detección satelital no es un incendio confirmado.",
+  );
+  await expect(page).not.toHaveURL(/lat=|lon=|correo=/);
+});
+
 test("prevention connects verified resources and excludes pending or private data", async ({
   page,
 }) => {
