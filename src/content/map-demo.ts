@@ -180,11 +180,135 @@ export const mapDemoDetections: readonly DemoDetection[] = [
   },
 ];
 
+/** Fictitious cluster centers only; these are not official administrative areas. */
+export const DEMO_ZONES: readonly {
+  id: string;
+  offset: readonly [number, number];
+}[] = [
+  { id: "demo-zone-a", offset: [0, 0] },
+  { id: "demo-zone-b", offset: [-0.12, 0.08] },
+  { id: "demo-zone-c", offset: [0.14, -0.09] },
+];
+
+export function isValidWgs84Coordinate(
+  coordinate: readonly [number, number],
+): boolean {
+  const [lng, lat] = coordinate;
+  return (
+    Number.isFinite(lng) &&
+    Number.isFinite(lat) &&
+    lng >= -180 &&
+    lng <= 180 &&
+    lat >= -90 &&
+    lat <= 90
+  );
+}
+
+/** Deterministic synthetic month aligned to calendar daily counts. Month is 0-based. */
+export function createSyntheticMonthDetections(
+  year: number,
+  month: number,
+  dailyCounts: readonly number[],
+  zoneIndex = 0,
+): DemoDetection[] {
+  if (!Number.isInteger(year) || year < 1 || year > 9999) {
+    throw new RangeError("year must be an integer between 1 and 9999");
+  }
+  if (!Number.isInteger(month) || month < 0 || month > 11) {
+    throw new RangeError("month must be a 0-based integer between 0 and 11");
+  }
+  if (
+    !Number.isInteger(zoneIndex) ||
+    zoneIndex < 0 ||
+    zoneIndex >= DEMO_ZONES.length
+  ) {
+    throw new RangeError("zoneIndex must identify one of the fictional zones");
+  }
+  if (dailyCounts.some((count) => !Number.isInteger(count) || count < 0)) {
+    throw new RangeError("dailyCounts must contain non-negative integers");
+  }
+
+  const zone = DEMO_ZONES[zoneIndex];
+  const monthEnd = new Date(0);
+  monthEnd.setUTCFullYear(year, month + 1, 0);
+  const daysInMonth = monthEnd.getUTCDate();
+  const records: DemoDetection[] = [];
+  let serial = 0;
+
+  for (let day = 0; day < daysInMonth; day += 1) {
+    const count = dailyCounts[day] ?? 0;
+    for (let index = 0; index < count; index += 1) {
+      const sensor: DemoSensor = serial % 2 === 0 ? "MODIS" : "VIIRS";
+      const satellite =
+        sensor === "MODIS" ? (serial % 4 === 0 ? "Terra" : "Aqua") : "S-NPP";
+      const angle =
+        ((serial * 137.508 + day * 29 + zoneIndex * 53) % 360) *
+        (Math.PI / 180);
+      const radius =
+        0.004 + ((serial * 7 + day * 3 + zoneIndex * 5) % 9) * 0.0015;
+      const coordinates: [number, number] = [
+        Number(
+          (DEMO_CENTER[0] + zone.offset[0] + Math.cos(angle) * radius).toFixed(
+            5,
+          ),
+        ),
+        Number(
+          (DEMO_CENTER[1] + zone.offset[1] + Math.sin(angle) * radius).toFixed(
+            5,
+          ),
+        ),
+      ];
+      if (!isValidWgs84Coordinate(coordinates)) {
+        throw new RangeError("generated coordinate is outside WGS84");
+      }
+
+      const acquired = new Date(0);
+      acquired.setUTCFullYear(year, month, day + 1);
+      acquired.setUTCHours(
+        sensor === "MODIS" ? 13 + (serial % 2) : 16 + (serial % 2),
+        (serial * 17 + day * 11 + zoneIndex * 7) % 60,
+        0,
+        0,
+      );
+
+      records.push({
+        id: `${zone.id}-${year}-${String(month + 1).padStart(2, "0")}-${String(day + 1).padStart(2, "0")}-${String(index + 1).padStart(3, "0")}`,
+        sensor,
+        satellite,
+        acquiredAt: acquired.toISOString(),
+        coordinates,
+        confidence: 55 + ((serial * 13 + day * 7 + zoneIndex * 11) % 41),
+        frpMw: Number(
+          (
+            2.5 +
+            ((serial * 37 + day * 19 + zoneIndex * 23) % 220) / 10
+          ).toFixed(1),
+        ),
+        is_demo: true,
+      });
+      serial += 1;
+    }
+  }
+
+  return records;
+}
+
 export type DemoFilter = {
   mode?: DemoMode;
   sensor?: DemoSensorFilter;
   day?: number;
 };
+
+function matchesFilter(
+  item: DemoDetection,
+  sensor: DemoSensorFilter,
+  day: number | undefined,
+) {
+  return (
+    (sensor === "all" || item.sensor === sensor) &&
+    (day === undefined || Number(item.acquiredAt.slice(8, 10)) === day)
+  );
+}
 
 /** Pure filter used by the map and its accessible data list. */
 export function filterDemoDetections({
@@ -193,17 +317,48 @@ export function filterDemoDetections({
   day,
 }: DemoFilter = {}): DemoDetection[] {
   const matches = mapDemoDetections
-    .filter((item) => sensor === "all" || item.sensor === sensor)
-    .filter(
-      (item) =>
-        day === undefined || Number(item.acquiredAt.slice(8, 10)) === day,
-    )
+    .filter((item) => matchesFilter(item, sensor, day))
     .slice()
     .sort((a, b) => a.acquiredAt.localeCompare(b.acquiredAt));
 
   if (mode === "recent") return matches.slice(-5);
   if (mode === "preview") return matches.slice(0, 8);
   return matches;
+}
+
+/** Supplied records keep their exact membership and order; only sensor/day filter. */
+export function filterDetectionRecords(
+  detections: readonly DemoDetection[],
+  { sensor = "all", day }: { sensor?: DemoSensorFilter; day?: number } = {},
+): DemoDetection[] {
+  return detections.filter((item) => matchesFilter(item, sensor, day));
+}
+
+export type DemoBounds = [[number, number], [number, number]];
+
+export function getDetectionBounds(
+  detections: readonly DemoDetection[],
+): DemoBounds | null {
+  let minLng = Number.POSITIVE_INFINITY;
+  let minLat = Number.POSITIVE_INFINITY;
+  let maxLng = Number.NEGATIVE_INFINITY;
+  let maxLat = Number.NEGATIVE_INFINITY;
+
+  for (const detection of detections) {
+    if (!isValidWgs84Coordinate(detection.coordinates)) continue;
+    const [lng, lat] = detection.coordinates;
+    minLng = Math.min(minLng, lng);
+    minLat = Math.min(minLat, lat);
+    maxLng = Math.max(maxLng, lng);
+    maxLat = Math.max(maxLat, lat);
+  }
+
+  return Number.isFinite(minLng)
+    ? [
+        [minLng, minLat],
+        [maxLng, maxLat],
+      ]
+    : null;
 }
 
 export type DemoAoiGeoJSON = {
@@ -220,18 +375,30 @@ export function buildAoiGeoJSON(
   closed = false,
 ): DemoAoiGeoJSON {
   const clean: [number, number][] = [];
-  for (const [lng, lat] of points) {
+  for (const point of points) {
+    const coordinate: [number, number] = [point[0], point[1]];
+    if (!isValidWgs84Coordinate(coordinate)) continue;
     const last = clean[clean.length - 1];
-    if (!last || last[0] !== lng || last[1] !== lat) clean.push([lng, lat]);
+    if (!last || last[0] !== coordinate[0] || last[1] !== coordinate[1]) {
+      clean.push(coordinate);
+    }
   }
 
-  if (closed && clean.length >= 3) {
+  const ring = clean.slice();
+  if (ring.length > 1) {
+    const first = ring[0];
+    const last = ring[ring.length - 1];
+    if (first[0] === last[0] && first[1] === last[1]) ring.pop();
+  }
+  const distinct = new Set(ring.map(([lng, lat]) => `${lng},${lat}`));
+
+  if (closed && distinct.size >= 3) {
     return {
       type: "Feature",
       properties: { is_demo: true },
       geometry: {
         type: "Polygon",
-        coordinates: [[...clean, [clean[0][0], clean[0][1]]]],
+        coordinates: [[...ring, [ring[0][0], ring[0][1]]]],
       },
     };
   }

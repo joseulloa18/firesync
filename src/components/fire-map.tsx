@@ -11,6 +11,8 @@ import {
   DEMO_CENTER,
   DEMO_ZOOM,
   filterDemoDetections,
+  filterDetectionRecords,
+  getDetectionBounds,
   type DemoDetection,
   type DemoMode,
   type DemoSensor,
@@ -38,6 +40,7 @@ export type FireMapLabels = {
 
 export type FireMapProps = {
   labels: FireMapLabels;
+  detections?: readonly DemoDetection[];
   mode?: DemoMode;
   sensor?: DemoSensorFilter;
   day?: number;
@@ -49,8 +52,19 @@ type MapStatus = "loading" | "ready" | "error" | "unavailable";
 
 const STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 
+function fitToDetections(
+  map: MapLibreMap | null,
+  detections: readonly DemoDetection[],
+) {
+  const bounds = getDetectionBounds(detections);
+  if (!map || !bounds) return false;
+  map.fitBounds(bounds, { padding: 48, maxZoom: 11, duration: 0 });
+  return true;
+}
+
 export function FireMap({
   labels,
+  detections: suppliedDetections,
   mode = "history",
   sensor = "all",
   day,
@@ -72,10 +86,26 @@ export function FireMap({
   const [finished, setFinished] = useState(false);
   const [points, setPoints] = useState<[number, number][]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const lastFitSignature = useRef<string | null>(null);
 
   const detections = useMemo(
-    () => filterDemoDetections({ mode, sensor, day }),
-    [mode, sensor, day],
+    () =>
+      suppliedDetections
+        ? filterDetectionRecords(suppliedDetections, { sensor, day })
+        : filterDemoDetections({ mode, sensor, day }),
+    [suppliedDetections, mode, sensor, day],
+  );
+  const suppliedSignature = useMemo(
+    () =>
+      suppliedDetections
+        ? suppliedDetections
+            .map(
+              (item) =>
+                `${item.id}|${item.sensor}|${item.acquiredAt}|${item.coordinates[0]}|${item.coordinates[1]}`,
+            )
+            .join(";")
+        : null,
+    [suppliedDetections],
   );
 
   useEffect(() => {
@@ -244,6 +274,17 @@ export function FireMap({
   }, []);
 
   useEffect(() => {
+    if (!mapReady) {
+      lastFitSignature.current = null;
+      return;
+    }
+    if (!suppliedDetections || suppliedSignature === null) return;
+    if (lastFitSignature.current === suppliedSignature) return;
+    lastFitSignature.current = suppliedSignature;
+    fitToDetections(mapRef.current, suppliedDetections);
+  }, [mapReady, suppliedDetections, suppliedSignature]);
+
+  useEffect(() => {
     const maplibre = moduleRef.current;
     const map = mapRef.current;
     if (!maplibre || !map || !mapReady) return;
@@ -303,6 +344,12 @@ export function FireMap({
   }, [finished, points, styleReady]);
 
   function resetView() {
+    if (
+      suppliedDetections &&
+      fitToDetections(mapRef.current, suppliedDetections)
+    ) {
+      return;
+    }
     mapRef.current?.flyTo({ center: DEMO_CENTER, zoom: DEMO_ZOOM });
   }
 
