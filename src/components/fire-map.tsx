@@ -18,6 +18,11 @@ import {
   type DemoSensor,
   type DemoSensorFilter,
 } from "@/content/map-demo";
+import {
+  ACTIVITY_PALETTE,
+  buildActivityGrid,
+  limitDetectionsForDisplay,
+} from "@/lib/geo/activity-grid";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./fire-map.css";
 
@@ -40,6 +45,11 @@ export type FireMapLabels = {
   noData: string;
   north: string;
   attributionToggle: string;
+  all: string;
+  activity: string;
+  activityUnit: string;
+  terrain: string;
+  terrainUnavailable: string;
 };
 
 export type FireMapProps = {
@@ -47,9 +57,9 @@ export type FireMapProps = {
   detections?: readonly DemoDetection[];
   mode?: DemoMode;
   sensor?: DemoSensorFilter;
-  /** Controlled history filter; implemented by the map task in the next PR. */
+  /** Optional controlled sensor filter. Without it the map keeps local state. */
   onSensorChange?: (sensor: DemoSensorFilter) => void;
-  /** Enable the spatial activity layer when supplied by the history view. */
+  /** Spatial activity layer. Defaults to true for history mode only. */
   activity?: boolean;
   day?: number;
   onSelect?: (detection: DemoDetection) => void;
@@ -57,8 +67,26 @@ export type FireMapProps = {
 
 type MapModule = typeof import("maplibre-gl");
 type MapStatus = "loading" | "ready" | "error" | "unavailable";
+type TerrainState = "off" | "loading" | "ready" | "error";
 
 const STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
+
+/**
+ * Mapterhorn publishes global Terrarium-encoded raster DEM tiles with CORS
+ * enabled and no key. Tile 8/77/114 covers the Dominican Republic. AWS
+ * Terrarium remains the origin of the encoding but does not send CORS headers.
+ * Attribution: https://mapterhorn.com/attribution
+ */
+const TERRAIN_SOURCE = "fmap-terrain-dem";
+const TERRAIN_HILLSHADE_LAYER = "fmap-terrain-hillshade";
+const TERRAIN_TILES = "https://tiles.mapterhorn.com/{z}/{x}/{y}.webp";
+const TERRAIN_MAX_ZOOM = 12;
+const TERRAIN_ATTRIBUTION = "© Mapterhorn";
+
+const ACTIVITY_SOURCE = "fmap-activity-grid";
+const ACTIVITY_FILL_LAYER = "fmap-activity-fill";
+const ACTIVITY_LINE_LAYER = "fmap-activity-line";
+const AOI_FILL_LAYER = "demo-aoi-fill";
 
 function fitToDetections(
   map: MapLibreMap | null,
@@ -75,6 +103,8 @@ export function FireMap({
   detections: suppliedDetections,
   mode = "history",
   sensor = "all",
+  onSensorChange,
+  activity,
   day,
   onSelect,
 }: FireMapProps) {
@@ -85,6 +115,7 @@ export function FireMap({
   const labelsRef = useRef(labels);
   const onSelectRef = useRef(onSelect);
   const drawingRef = useRef(false);
+  const terrainEnabledRef = useRef(false);
   const [status, setStatus] = useState<MapStatus>("loading");
   const [tileError, setTileError] = useState(false);
   const [retryToken, setRetryToken] = useState(0);
@@ -94,14 +125,39 @@ export function FireMap({
   const [finished, setFinished] = useState(false);
   const [points, setPoints] = useState<[number, number][]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [internalSensor, setInternalSensor] =
+    useState<DemoSensorFilter>(sensor);
+  const [sensorProp, setSensorProp] = useState<DemoSensorFilter>(sensor);
+  const [terrainState, setTerrainState] = useState<TerrainState>("off");
   const lastFitSignature = useRef<string | null>(null);
+
+  if (sensorProp !== sensor) {
+    // Reset only the uncontrolled value when the caller changes the prop.
+    setSensorProp(sensor);
+    setInternalSensor(sensor);
+  }
+
+  const activeSensor = onSensorChange ? sensor : internalSensor;
+  const showActivity = activity ?? mode === "history";
+  const terrainEnabled = terrainState === "loading" || terrainState === "ready";
 
   const detections = useMemo(
     () =>
       suppliedDetections
-        ? filterDetectionRecords(suppliedDetections, { sensor, day })
-        : filterDemoDetections({ mode, sensor, day }),
-    [suppliedDetections, mode, sensor, day],
+        ? filterDetectionRecords(suppliedDetections, {
+            sensor: activeSensor,
+            day,
+          })
+        : filterDemoDetections({ mode, sensor: activeSensor, day }),
+    [suppliedDetections, mode, activeSensor, day],
+  );
+  const activityGrid = useMemo(
+    () => (showActivity ? buildActivityGrid(detections) : null),
+    [detections, showActivity],
+  );
+  const markerBudget = useMemo(
+    () => limitDetectionsForDisplay(detections),
+    [detections],
   );
   const suppliedSignature = useMemo(
     () =>
@@ -123,6 +179,30 @@ export function FireMap({
   useEffect(() => {
     onSelectRef.current = onSelect;
   }, [onSelect]);
+
+  useEffect(() => {
+    terrainEnabledRef.current = terrainEnabled;
+  }, [terrainEnabled]);
+
+  const fallbackTerrain = useCallback((map: MapLibreMap | null | undefined) => {
+    terrainEnabledRef.current = false;
+    setTerrainState("error");
+    try {
+      map?.setTerrain(null);
+    } catch {
+      // The style may already be gone after a failed WebGL context.
+    }
+    try {
+      if (map?.getLayer(TERRAIN_HILLSHADE_LAYER)) {
+        map.removeLayer(TERRAIN_HILLSHADE_LAYER);
+      }
+      if (map?.getSource(TERRAIN_SOURCE)) {
+        map.removeSource(TERRAIN_SOURCE);
+      }
+    } catch {
+      // Keep the flat map usable even if cleanup races a style reload.
+    }
+  }, []);
 
   useEffect(() => {
     drawingRef.current = drawing;
@@ -204,8 +284,15 @@ export function FireMap({
         setTileError(false);
         if (timeout !== undefined) window.clearTimeout(timeout);
       });
-      map.on("error", () => {
+      map.on("error", (event) => {
         if (cancelled) return;
+        const sourceId = (event as { sourceId?: string }).sourceId;
+        const errorSourceId = (event.error as { sourceId?: string } | undefined)
+          ?.sourceId;
+        if (sourceId === TERRAIN_SOURCE || errorSourceId === TERRAIN_SOURCE) {
+          fallbackTerrain(map);
+          return;
+        }
         setTileError(true);
         setStatus((current) =>
           current === "loading" ? "unavailable" : current,
@@ -215,6 +302,9 @@ export function FireMap({
         if (cancelled) return;
         setTileError(false);
         setStatus((current) => (current === "unavailable" ? "ready" : current));
+        setTerrainState((current) =>
+          current === "loading" ? "ready" : current,
+        );
       });
       map.on("click", (event) => {
         if (!drawingRef.current) return;
@@ -268,7 +358,7 @@ export function FireMap({
         // MapLibre can throw when WebGL never initialized.
       }
     };
-  }, [retryToken]);
+  }, [fallbackTerrain, retryToken]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -311,7 +401,7 @@ export function FireMap({
     if (!maplibre || !map || !mapReady) return;
 
     markersRef.current.forEach((marker) => marker.remove());
-    markersRef.current = detections.map((detection) => {
+    markersRef.current = markerBudget.visible.map((detection) => {
       const button = document.createElement("button");
       const sensorText =
         detection.sensor === "MODIS" ? labels.modis : labels.viirs;
@@ -336,7 +426,150 @@ export function FireMap({
       markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = [];
     };
-  }, [detections, labels, mapReady, selectDetection, selectedId]);
+  }, [markerBudget, labels, mapReady, selectDetection, selectedId]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !styleReady) return;
+
+    const removeActivity = () => {
+      try {
+        if (map.getLayer(ACTIVITY_LINE_LAYER)) {
+          map.removeLayer(ACTIVITY_LINE_LAYER);
+        }
+        if (map.getLayer(ACTIVITY_FILL_LAYER)) {
+          map.removeLayer(ACTIVITY_FILL_LAYER);
+        }
+        if (map.getSource(ACTIVITY_SOURCE)) {
+          map.removeSource(ACTIVITY_SOURCE);
+        }
+      } catch {
+        // A style reload already removed the layers.
+      }
+    };
+
+    if (!activityGrid) {
+      removeActivity();
+      return;
+    }
+
+    try {
+      const data = activityGrid.collection as unknown as Parameters<
+        GeoJSONSource["setData"]
+      >[0];
+      const source = map.getSource(ACTIVITY_SOURCE) as
+        GeoJSONSource | undefined;
+      if (!source) {
+        map.addSource(ACTIVITY_SOURCE, { type: "geojson", data });
+      } else {
+        source.setData(data);
+      }
+
+      if (!map.getLayer(ACTIVITY_FILL_LAYER)) {
+        const beforeId = map.getLayer(AOI_FILL_LAYER)
+          ? AOI_FILL_LAYER
+          : undefined;
+        map.addLayer(
+          {
+            id: ACTIVITY_FILL_LAYER,
+            type: "fill",
+            source: ACTIVITY_SOURCE,
+            paint: {
+              "fill-color": [
+                "match",
+                ["get", "level"],
+                0,
+                ACTIVITY_PALETTE[0],
+                1,
+                ACTIVITY_PALETTE[1],
+                2,
+                ACTIVITY_PALETTE[2],
+                3,
+                ACTIVITY_PALETTE[3],
+                ACTIVITY_PALETTE[0],
+              ],
+              "fill-opacity": 0.62,
+            },
+          },
+          beforeId,
+        );
+        map.addLayer(
+          {
+            id: ACTIVITY_LINE_LAYER,
+            type: "line",
+            source: ACTIVITY_SOURCE,
+            paint: {
+              "line-color": ACTIVITY_PALETTE[3],
+              "line-width": 0.6,
+              "line-opacity": 0.45,
+            },
+          },
+          beforeId,
+        );
+      }
+    } catch {
+      // The next style load re-adds the layer with the current records.
+    }
+  }, [activityGrid, styleReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !styleReady) return;
+
+    if (!terrainEnabled) {
+      try {
+        map.setTerrain(null);
+      } catch {
+        // The style may already be gone.
+      }
+      try {
+        if (map.getLayer(TERRAIN_HILLSHADE_LAYER)) {
+          map.removeLayer(TERRAIN_HILLSHADE_LAYER);
+        }
+        if (map.getSource(TERRAIN_SOURCE)) {
+          map.removeSource(TERRAIN_SOURCE);
+        }
+      } catch {
+        // Keep the flat map usable if cleanup races a style reload.
+      }
+      return;
+    }
+
+    try {
+      if (!map.getSource(TERRAIN_SOURCE)) {
+        map.addSource(TERRAIN_SOURCE, {
+          type: "raster-dem",
+          tiles: [TERRAIN_TILES],
+          tileSize: 512,
+          maxzoom: TERRAIN_MAX_ZOOM,
+          encoding: "terrarium",
+          attribution: TERRAIN_ATTRIBUTION,
+        });
+      }
+      map.setTerrain({ source: TERRAIN_SOURCE, exaggeration: 1.2 });
+      if (!map.getLayer(TERRAIN_HILLSHADE_LAYER)) {
+        const beforeId = map
+          .getStyle()
+          .layers?.find((layer) => layer.type === "symbol")?.id;
+        map.addLayer(
+          {
+            id: TERRAIN_HILLSHADE_LAYER,
+            type: "hillshade",
+            source: TERRAIN_SOURCE,
+            paint: {
+              "hillshade-shadow-color": "#3f3f46",
+              "hillshade-highlight-color": "#fafaf9",
+              "hillshade-accent-color": "#9ca3af",
+              "hillshade-exaggeration": 0.35,
+            },
+          },
+          beforeId,
+        );
+      }
+    } catch {
+      fallbackTerrain(map);
+    }
+  }, [fallbackTerrain, retryToken, styleReady, terrainEnabled]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -398,6 +631,23 @@ export function FireMap({
     mapRef.current?.doubleClickZoom.enable();
   }
 
+  function changeSensor(next: DemoSensorFilter) {
+    if (onSensorChange) {
+      onSensorChange(next);
+      return;
+    }
+    setInternalSensor(next);
+  }
+
+  function toggleTerrain() {
+    // Without a loaded style there is nothing to attach the terrain source to,
+    // so the button stays disabled until the map is ready.
+    if (status !== "ready" || !mapRef.current) return;
+    const nextEnabled = !terrainEnabled;
+    terrainEnabledRef.current = nextEnabled;
+    setTerrainState(nextEnabled ? "loading" : "off");
+  }
+
   const sensorText = (value: DemoSensor) =>
     value === "MODIS" ? labels.modis : labels.viirs;
   const statusText =
@@ -444,6 +694,57 @@ export function FireMap({
         </div>
       </div>
 
+      <div className="fmap-toolbar">
+        <div className="fmap-sensors">
+          {(["all", "MODIS", "VIIRS"] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={activeSensor === value}
+              onClick={() => changeSensor(value)}
+            >
+              {value === "all" ? labels.all : sensorText(value)}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="fmap-terrain-toggle"
+          aria-pressed={terrainEnabled}
+          aria-busy={terrainState === "loading"}
+          disabled={status !== "ready"}
+          onClick={toggleTerrain}
+        >
+          {labels.terrain}
+        </button>
+        {terrainState === "error" && (
+          <span className="fmap-terrain-error" role="status">
+            {labels.terrainUnavailable}
+          </span>
+        )}
+      </div>
+
+      {activityGrid && (
+        <div className="fmap-activity">
+          <span className="fmap-activity-title">{labels.activity}</span>
+          <span className="fmap-activity-scale" aria-hidden="true">
+            {ACTIVITY_PALETTE.map((color) => (
+              <i
+                key={color}
+                className="fmap-activity-swatch"
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </span>
+          <span className="fmap-activity-range">
+            {activityGrid.maxCount > 0
+              ? `1–${activityGrid.maxCount}`
+              : labels.noData}
+          </span>
+          <span className="fmap-activity-unit">{labels.activityUnit}</span>
+        </div>
+      )}
+
       <div className="fmap-legend" aria-label={labels.legend}>
         <span>
           <i className="fmap-swatch fmap-modis" aria-hidden="true" />
@@ -466,37 +767,49 @@ export function FireMap({
         {detections.length === 0 ? (
           <p>{labels.noData}</p>
         ) : (
-          <ul>
-            {detections.map((detection) => (
-              <li key={detection.id}>
-                <button
-                  type="button"
-                  aria-pressed={detection.id === selectedId}
-                  aria-label={`${sensorText(detection.sensor)} ${detection.acquiredAt} ${labels.demo}`}
-                  onClick={() => {
-                    selectDetection(detection);
-                    mapRef.current?.flyTo({
-                      center: detection.coordinates,
-                      zoom: 11,
-                    });
-                  }}
-                >
-                  <i
-                    className={`fmap-swatch fmap-${detection.sensor.toLowerCase()}`}
-                    aria-hidden="true"
-                  />
-                  <span>{sensorText(detection.sensor)}</span>
-                  <span>{detection.satellite}</span>
-                  <time dateTime={detection.acquiredAt}>
-                    {detection.acquiredAt}
-                  </time>
-                  <span>{detection.confidence}</span>
-                  <span>{detection.frpMw}</span>
-                  <span className="fmap-badge">{labels.demo}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul>
+              {markerBudget.visible.map((detection) => (
+                <li key={detection.id}>
+                  <button
+                    type="button"
+                    aria-pressed={detection.id === selectedId}
+                    aria-label={`${sensorText(detection.sensor)} ${detection.acquiredAt} ${labels.demo}`}
+                    onClick={() => {
+                      selectDetection(detection);
+                      mapRef.current?.flyTo({
+                        center: detection.coordinates,
+                        zoom: 11,
+                      });
+                    }}
+                  >
+                    <i
+                      className={`fmap-swatch fmap-${detection.sensor.toLowerCase()}`}
+                      aria-hidden="true"
+                    />
+                    <span>{sensorText(detection.sensor)}</span>
+                    <span>{detection.satellite}</span>
+                    <time dateTime={detection.acquiredAt}>
+                      {detection.acquiredAt}
+                    </time>
+                    <span>{detection.confidence}</span>
+                    <span>{detection.frpMw}</span>
+                    <span className="fmap-badge">{labels.demo}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {markerBudget.hiddenCount > 0 && (
+              <p
+                className="fmap-limit"
+                role="note"
+                aria-label={`${labels.list}: ${markerBudget.visible.length} / ${detections.length}`}
+              >
+                <span aria-hidden="true">… </span>
+                {markerBudget.visible.length} / {detections.length}
+              </p>
+            )}
+          </>
         )}
       </details>
     </div>

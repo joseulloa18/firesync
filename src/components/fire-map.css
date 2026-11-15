@@ -84,6 +84,7 @@
 
 .fmap-status button:focus-visible,
 .fmap-controls button:focus-visible,
+.fmap-toolbar button:focus-visible,
 .fmap-list button:focus-visible,
 .fmap-marker:focus-visible {
   outline: 3px solid #1d4ed8;
@@ -124,6 +125,102 @@
 .fmap-marker.is-selected {
   outline: 3px solid #111827;
   outline-offset: 2px;
+}
+
+.fmap-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.fmap-sensors {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid #94a3b8;
+  border-radius: 0.5rem;
+  background: #ffffff;
+}
+
+.fmap-sensors button,
+.fmap-terrain-toggle {
+  min-height: 2rem;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid #94a3b8;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+  cursor: pointer;
+}
+
+.fmap-sensors button {
+  border-width: 0 1px 0 0;
+  border-color: #e2e8f0;
+  border-radius: 0;
+}
+
+.fmap-sensors button:last-child {
+  border-right-width: 0;
+}
+
+.fmap-sensors button[aria-pressed="true"],
+.fmap-terrain-toggle[aria-pressed="true"] {
+  border-color: #b45309;
+  background: #fef3c7;
+  color: #78350f;
+}
+
+.fmap-terrain-toggle {
+  border-radius: 0.5rem;
+}
+
+.fmap-terrain-toggle[aria-busy="true"] {
+  cursor: progress;
+}
+
+.fmap-toolbar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.fmap-terrain-error {
+  flex-basis: 100%;
+  color: #78350f;
+  font-size: 0.8rem;
+}
+
+.fmap-activity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: #3f3f46;
+  font-size: 0.875rem;
+}
+
+.fmap-activity-title {
+  font-weight: 600;
+}
+
+.fmap-activity-scale {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+.fmap-activity-swatch {
+  width: 1.15rem;
+  height: 0.8rem;
+  border: 1px solid rgb(15 23 42 / 0.15);
+  border-radius: 0.15rem;
+}
+
+.fmap-activity-range {
+  font-variant-numeric: tabular-nums;
+}
+
+.fmap-activity-unit {
+  color: #52525b;
 }
 
 .fmap-legend {
@@ -202,6 +299,13 @@
 }
 
 .fmap-list time {
+  font-variant-numeric: tabular-nums;
+}
+
+.fmap-limit {
+  margin: 0.35rem 0 0;
+  color: #52525b;
+  font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
 }
 
