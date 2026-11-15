@@ -61,13 +61,19 @@ test("prevention connects verified resources and excludes pending or private dat
 
 test("zone selector is keyboard accessible and the sheet downloads", async ({
   page,
+  isMobile,
 }) => {
   await page.goto("/es/prevencion?zona=north");
   const select = page.getByTestId("zone-select");
   await expect(select).toHaveValue("north");
 
-  await select.focus();
-  await page.keyboard.press("ArrowDown");
+  if (isMobile) {
+    // Mobile native pickers do not commit selection with desktop arrow keys.
+    await select.selectOption("south");
+  } else {
+    await select.focus();
+    await page.keyboard.press("ArrowDown");
+  }
   await expect(select).toHaveValue("south");
 
   const downloadPromise = page.waitForEvent("download");
