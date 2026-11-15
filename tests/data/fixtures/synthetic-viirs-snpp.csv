@@ -1,0 +1,6 @@
+# SYNTHETIC TEST FIXTURE - NOT REAL NASA FIRMS DATA
+# Values and coordinates are fabricated for parser tests only.
+latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight,type
+18.4719,-69.9128,340.1,0.6,0.5,2024-03-01,143,S-NPP,VIIRS synthetic,h,2.0NRT,295.2,6.2,D,0
+18.4725,-69.9121,338.4,0.6,0.5,2024-03-01,1432,S-NPP,VIIRS synthetic,h,2.0NRT,294.8,5.8,N,0
+18.4804,-69.8997,321.7,0.6,0.5,2024-03-02,202,S-NPP,VIIRS synthetic,n,2.0NRT,288.1,1.4,D,0
