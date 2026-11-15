@@ -10,6 +10,10 @@ const migrationName = readdirSync(migrationsDir).find((name) =>
   name.endsWith(".sql"),
 );
 const sql = readFileSync(path.join(migrationsDir, migrationName), "utf8");
+const runner = readFileSync(
+  path.join(root, "scripts", "db-migrate.mjs"),
+  "utf8",
+);
 
 const tables = [
   "regions",
@@ -113,6 +117,10 @@ test("service_role escribe solo si existe y public no gana escritura", () => {
   );
   assert.match(
     sql,
+    /grant usage on schema public, extensions to service_role/i,
+  );
+  assert.match(
+    sql,
     /grant insert, update, delete on table[\s\S]*?to service_role/i,
   );
   assert.match(
@@ -122,6 +130,25 @@ test("service_role escribe solo si existe y public no gana escritura", () => {
   assert.doesNotMatch(
     sql,
     /grant\s+(?:insert|update|delete)[^;]*\bto public\b/i,
+  );
+});
+
+test("el runner protege el ledger de migraciones", () => {
+  assert.match(
+    runner,
+    /alter table public\.schema_migrations enable row level security/i,
+  );
+  assert.match(
+    runner,
+    /revoke all on table public\.schema_migrations from public/i,
+  );
+  assert.match(
+    runner,
+    /revoke all on table public\.schema_migrations from anon/i,
+  );
+  assert.match(
+    runner,
+    /revoke all on table public\.schema_migrations from authenticated/i,
   );
 });
 
