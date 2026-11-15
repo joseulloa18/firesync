@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FireMap } from "./fire-map";
+import { recentDetections } from "@/content/recent-demo";
 import type { DemoDetection, DemoSensorFilter } from "@/content/map-demo";
 import { Calendar } from "./calendar";
 import { DataProvenance } from "./data-provenance";
@@ -735,69 +736,6 @@ export function HistoryDashboard({
     </>
   );
 }
-
-const recentDetections: DemoDetection[] = [
-  {
-    id: "demo-modis-001",
-    sensor: "MODIS",
-    satellite: "Terra · demo",
-    acquiredAt: "2026-11-15T17:42:00Z",
-    coordinates: [-69.931, 18.471],
-    confidence: 74,
-    frpMw: 18.4,
-    is_demo: true,
-  },
-  {
-    id: "demo-viirs-002",
-    sensor: "VIIRS",
-    satellite: "S-NPP · demo",
-    acquiredAt: "2026-11-15T16:18:00Z",
-    coordinates: [-70.412, 18.735],
-    confidence: 61,
-    frpMw: 9.7,
-    is_demo: true,
-  },
-  {
-    id: "demo-modis-003",
-    sensor: "MODIS",
-    satellite: "Aqua · demo",
-    acquiredAt: "2026-11-15T09:05:00Z",
-    coordinates: [-69.208, 18.902],
-    confidence: 52,
-    frpMw: 6.2,
-    is_demo: true,
-  },
-  {
-    id: "demo-viirs-004",
-    sensor: "VIIRS",
-    satellite: "S-NPP · demo",
-    acquiredAt: "2026-11-14T20:11:00Z",
-    coordinates: [-71.031, 19.351],
-    confidence: 83,
-    frpMw: 24.1,
-    is_demo: true,
-  },
-  {
-    id: "demo-modis-005",
-    sensor: "MODIS",
-    satellite: "Terra · demo",
-    acquiredAt: "2026-11-13T15:48:00Z",
-    coordinates: [-69.745, 19.018],
-    confidence: 45,
-    frpMw: 3.8,
-    is_demo: true,
-  },
-  {
-    id: "demo-viirs-006",
-    sensor: "VIIRS",
-    satellite: "S-NPP · demo",
-    acquiredAt: "2026-11-11T11:30:00Z",
-    coordinates: [-70.677, 18.312],
-    confidence: 68,
-    frpMw: 14.5,
-    is_demo: true,
-  },
-];
 
 function formatUtc(iso: string, locale: Locale, utcLabel: string) {
   const formatted = new Intl.DateTimeFormat(

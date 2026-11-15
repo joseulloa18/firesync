@@ -20,27 +20,25 @@ test("prevention connects verified resources and excludes pending or private dat
   const nineOneOne = resources.getByRole("link", {
     name: /911\.gob\.do\/como-usarlo/,
   });
-  await expect(nineOneOne).toHaveAttribute(
-    "href",
-    "https://911.gob.do/como-usarlo/",
-  );
-  await expect(nineOneOne).toHaveAttribute("target", "_blank");
-  await expect(nineOneOne).toHaveAttribute("rel", /noopener/);
+  await expect(nineOneOne).toHaveCount(0);
 
   await expect(resources).toContainText("Ministerio de Medio Ambiente");
   await expect(resources).toContainText("Revisión");
   await expect(resources).toContainText("Vigente hasta");
   await expect(resources).toContainText("Cobertura");
   await expect(resources).toContainText(
-    "1 recurso pendiente de revisión no se muestra.",
+    "2 recurso pendiente de revisión no se muestra.",
   );
   await expect(
     resources.getByRole("link", { name: /Estrategia Nacional de Manejo/ }),
   ).toHaveCount(0);
   await expect(
-    page.getByText(
-      "Vista pública: no incluye zonas privadas, correos, activos ni contactos institucionales.",
-    ),
+    page
+      .getByRole("main")
+      .locator(".pr-controls")
+      .getByText(
+        "Vista pública: no incluye zonas privadas, correos, activos ni contactos institucionales.",
+      ),
   ).toBeVisible();
 });
 
@@ -131,9 +129,12 @@ test("private parameters are ignored and never echoed", async ({ page }) => {
   );
   await expect(page.getByText("private@example.com")).toHaveCount(0);
   await expect(
-    page.getByText(
-      "Vista pública: no incluye zonas privadas, correos, activos ni contactos institucionales.",
-    ),
+    page
+      .getByRole("main")
+      .locator(".pr-controls")
+      .getByText(
+        "Vista pública: no incluye zonas privadas, correos, activos ni contactos institucionales.",
+      ),
   ).toBeVisible();
 });
 
@@ -151,6 +152,8 @@ test("prevention and response are available in English", async ({ page }) => {
     page.getByRole("heading", { name: "Selected detection", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("In an emergency call 9-1-1 in the Dominican Republic."),
+    page
+      .getByRole("main")
+      .getByText("In an emergency call 9-1-1 in the Dominican Republic."),
   ).toBeVisible();
 });

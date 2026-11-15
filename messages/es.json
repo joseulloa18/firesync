@@ -214,7 +214,7 @@
     "excludedOther": "{count} recurso no se muestra por no cumplir el territorio o el origen.",
     "excludedNone": "No se excluyeron recursos pendientes ni vencidos.",
     "detectionTitle": "Detección seleccionada",
-    "detectionContextNote": "Estos datos llegan como contexto del enlace. No se verificaron con el servidor y no confirman un incendio.",
+    "detectionContextNote": "Datos sintéticos resueltos desde un registro de demostración conocido. No confirman un incendio.",
     "detectionEmptyTitle": "Sin detección seleccionada",
     "detectionEmptyText": "No hay contexto válido de una detección en este enlace. Si vienes de Actualidad, abre la ficha y usa su enlace; no se inventan coordenadas, sensor ni hora.",
     "invalidContext": "Parte del contexto del enlace no es válido y se ignoró. No se muestran datos inventados.",

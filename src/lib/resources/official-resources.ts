@@ -14,7 +14,12 @@
  */
 import { z } from "zod";
 import catalogJson from "@/content/official-resource-catalog.json";
-import { DEMO_ZONES, type DemoSensor } from "@/content/map-demo";
+import {
+  DEMO_ZONES,
+  mapDemoDetections,
+  type DemoSensor,
+} from "@/content/map-demo";
+import { recentDetections } from "@/content/recent-demo";
 import {
   createMonthSummary,
   HISTORY_START_YEAR,
@@ -334,6 +339,25 @@ export function parseResponseContext(
   const presentFields = DETECTION_FIELDS.filter(
     (field) => params[field] !== undefined,
   );
+  const known = [...mapDemoDetections, ...recentDetections].find(
+    (item) => item.id === params.deteccion,
+  );
+  // Links carry an ID, never authority to invent satellite observations.
+  if (presentFields.length === 1 && presentFields[0] === "deteccion") {
+    return {
+      zone,
+      detection: known
+        ? {
+            id: known.id,
+            coordinates: [...known.coordinates],
+            sensor: known.sensor,
+            satellite: known.satellite,
+            acquiredAt: new Date(known.acquiredAt).toISOString(),
+          }
+        : null,
+      invalidFields: known ? invalidFields : [...invalidFields, "deteccion"],
+    };
+  }
   let detection: ResponseDetectionContext | null = null;
 
   if (presentFields.length > 0) {
@@ -384,6 +408,18 @@ export function parseResponseContext(
         }
 
         if (detectionInvalid.length === 0) {
+          if (
+            !known ||
+            known.sensor !== data.sensor ||
+            known.satellite !== data.satelite ||
+            known.coordinates[0] !== data.lon ||
+            known.coordinates[1] !== data.lat ||
+            Date.parse(known.acquiredAt) !== acquired
+          ) {
+            detectionInvalid.push("deteccion");
+          }
+        }
+        if (detectionInvalid.length === 0) {
           detection = {
             id: data.deteccion,
             coordinates,
@@ -414,11 +450,6 @@ export function buildContextQuery({
   const params = new URLSearchParams({ zona: zone });
   if (detection) {
     params.set("deteccion", detection.id);
-    params.set("lat", String(detection.coordinates[1]));
-    params.set("lon", String(detection.coordinates[0]));
-    params.set("sensor", detection.sensor);
-    params.set("satelite", detection.satellite);
-    params.set("adquirido", detection.acquiredAt);
   }
   return params.toString();
 }

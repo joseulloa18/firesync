@@ -46,13 +46,13 @@ const VALID_CONTEXT = {
 };
 
 describe("catálogo oficial: contrato y filtrado", () => {
-  it("valida el catálogo integrado y conserva el 9-1-1 revisado", () => {
+  it("valida el catálogo y excluye el 9-1-1 pendiente de nueva revisión", () => {
     const state = loadOfficialResourceCatalog(catalogJson, NOW);
     expect(state.status).toBe("ready");
     if (state.status !== "ready") return;
 
     expect(state.resources.some((item) => item.id === "911-como-usarlo")).toBe(
-      true,
+      false,
     );
     expect(
       state.resources.every((item) => item.reviewStatus === "verified_source"),
@@ -175,6 +175,20 @@ describe("catálogo oficial: contrato y filtrado", () => {
 });
 
 describe("contexto público de navegación", () => {
+  it("resuelve IDs conocidos y rechaza datos inventados o alterados", () => {
+    const resolved = parseResponseContext(
+      { zona: "north", deteccion: "demo-modis-001" },
+      NOW,
+    );
+    expect(resolved.detection?.coordinates).toEqual([-69.931, 18.471]);
+    expect(resolved.detection?.sensor).toBe("MODIS");
+    expect(
+      parseResponseContext({ deteccion: "inventado" }, NOW).detection,
+    ).toBeNull();
+    expect(
+      parseResponseContext({ ...VALID_CONTEXT, lon: "-70.54" }, NOW).detection,
+    ).toBeNull();
+  });
   it("acepta una detección completa y normaliza la coordenada [lon, lat]", () => {
     const context = parseResponseContext(VALID_CONTEXT, NOW);
     expect(context.invalidFields).toEqual([]);
@@ -202,7 +216,7 @@ describe("contexto público de navegación", () => {
     );
     expect(incomplete.detection).toBeNull();
     expect(incomplete.invalidFields).toEqual(
-      expect.arrayContaining(["lat", "lon", "sensor", "satelite", "adquirido"]),
+      expect.arrayContaining(["deteccion"]),
     );
 
     const outside = parseResponseContext(
@@ -368,7 +382,7 @@ describe("ficha compartible", () => {
 
     expect(text).toContain("FICHA DE ZONA");
     expect(text).toContain("Recursos");
-    expect(text).toContain("https://911.gob.do/como-usarlo/");
+    expect(text).not.toContain("https://911.gob.do/como-usarlo/");
     expect(text).not.toContain("private@example.com");
     expect(text).not.toContain("correo");
     if (context.detection) {

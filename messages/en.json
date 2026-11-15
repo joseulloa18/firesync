@@ -214,7 +214,7 @@
     "excludedOther": "{count} resource is not shown because it does not meet the territory or source rules.",
     "excludedNone": "No pending or expired resources were excluded.",
     "detectionTitle": "Selected detection",
-    "detectionContextNote": "These values arrive as link context. They were not verified by the server and do not confirm a fire.",
+    "detectionContextNote": "Synthetic data resolved from a known demonstration record. They do not confirm a fire.",
     "detectionEmptyTitle": "No selected detection",
     "detectionEmptyText": "There is no valid detection context in this link. If you came from Latest activity, open the card and use its link; coordinates, sensor and time are never invented.",
     "invalidContext": "Part of the link context is invalid and was ignored. No invented data is shown.",

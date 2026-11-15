@@ -157,3 +157,15 @@ cada sitio o pedir autorización.
 En una emergencia en República Dominicana, llama al **9-1-1**. Este catálogo y
 la aplicación no sustituyen a los servicios de emergencia. Una detección
 satelital no es un incendio confirmado.
+
+## Revisión de integración de Prevención/Respuesta
+
+La ficha `911-como-usarlo` pasa a `pending`: la revisión central obtuvo HTTP 403
+y no pudo repetir la comprobación. Se excluye de la interfaz y de fichas exportadas
+hasta validar su contenido de nuevo. La tabla anterior conserva el registro histórico
+de la revisión inicial; no representa el estado vigente de esa ficha. El aviso general
+de emergencia del proyecto y el enlace voluntario `tel:911` permanecen.
+
+El contexto de Respuesta se resuelve por ID de un registro sintético conocido;
+los parámetros antiguos con coordenadas se aceptan solo si coinciden con ese registro.
+No se admiten observaciones inventadas por texto libre en un enlace.
