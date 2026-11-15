@@ -1,0 +1,51 @@
+name: Database checks
+on: [push, pull_request]
+jobs:
+  postgis:
+    runs-on: ubuntu-latest
+    services:
+      postgis:
+        image: postgis/postgis:16-3.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: firesync_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d firesync_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/firesync_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Simular PostGIS en extensions (solo DB efímera)
+        run: |
+          node --input-type=module -e '
+          import { Client } from "pg";
+          const client = new Client({ connectionString: process.env.DATABASE_URL });
+          await client.connect();
+          await client.query("drop extension if exists postgis cascade");
+          await client.end();
+          '
+      - name: Crear roles de prueba
+        run: |
+          node --input-type=module -e '
+          import { Client } from "pg";
+          const client = new Client({ connectionString: process.env.DATABASE_URL });
+          await client.connect();
+          await client.query("create role anon nologin");
+          await client.query("create role service_role nologin bypassrls");
+          await client.end();
+          '
+      - run: pnpm db:migrate
+      - run: node scripts/db-check.mjs
+      - run: pnpm test:db

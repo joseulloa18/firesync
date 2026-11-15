@@ -66,6 +66,24 @@ async function main() {
         applied_at timestamptz not null default now()
       );
     `);
+    await client.query(
+      "alter table public.schema_migrations enable row level security",
+    );
+    await client.query(
+      "revoke all on table public.schema_migrations from public",
+    );
+    await client.query(`
+      do $$
+      begin
+        if exists (select 1 from pg_catalog.pg_roles where rolname = 'anon') then
+          execute 'revoke all on table public.schema_migrations from anon';
+        end if;
+        if exists (select 1 from pg_catalog.pg_roles where rolname = 'authenticated') then
+          execute 'revoke all on table public.schema_migrations from authenticated';
+        end if;
+      end
+      $$;
+    `);
     const { rows } = await client.query(
       "select version, checksum from public.schema_migrations order by version",
     );

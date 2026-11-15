@@ -199,10 +199,30 @@ grant select on public.cell_month to public;
 grant select on public.calibration_factors to public;
 grant select on public.region_month_stats to public;
 
+-- Supabase crea service_role con BYPASSRLS. Fuera de Supabase el rol puede no
+-- existir: en ese caso se omite el grant sin fallar la migración. Nunca se
+-- concede escritura a public/anon/authenticated.
+do $$
+begin
+  if exists (select 1 from pg_catalog.pg_roles where rolname = 'service_role') then
+    execute 'grant usage on schema public, extensions to service_role';
+    execute 'grant insert, update, delete on table
+      public.regions, public.grid_cells, public.raw_detections,
+      public.cell_day_occupancy, public.cell_month,
+      public.calibration_factors, public.region_month_stats
+      to service_role';
+    execute 'grant usage, select on sequence public.raw_detections_id_seq
+      to service_role';
+  end if;
+end
+$$;
+
 -- Vistas de la CDO histórica. security_invoker respeta la RLS y los privilegios
--- del llamador. Primero se prefiere SP sobre NRT por satélite y día; después se
--- colapsa a una fila por celda/día/sensor. Terra + Aqua en la misma celda/día
--- cuentan una sola CDO, no dos.
+-- del llamador. Primero se prefiere SP sobre NRT por celda/satélite/día; después
+-- se colapsa a una fila por celda/día/sensor. Terra + Aqua en la misma
+-- celda/día cuentan una sola CDO, no dos.
+-- Limitación: saber si un día/satélite tiene cobertura SP completa requiere un
+-- manifiesto de productos; esta vista solo detecta SP ya ingerido por celda.
 create view public.historical_product_detections
 with (security_invoker = true) as
 with eligible as (
@@ -212,14 +232,14 @@ with eligible as (
     and confidence <> 'low'
 ),
 sp_available as (
-  select acq_date, satellite, bool_or(source = 'VIIRS_SNPP_SP') as has_sp
+  select cell_id, acq_date, satellite, bool_or(source = 'VIIRS_SNPP_SP') as has_sp
   from eligible
-  group by acq_date, satellite
+  group by cell_id, acq_date, satellite
 )
 select e.id, e.cell_id, e.source, e.sensor, e.satellite, e.acq_at, e.acq_date,
        e.confidence, e.frp, e.geom
 from eligible e
-join sp_available s using (acq_date, satellite)
+join sp_available s using (cell_id, acq_date, satellite)
 where not s.has_sp or e.source = 'VIIRS_SNPP_SP';
 
 create view public.historical_cell_day_occupancy
