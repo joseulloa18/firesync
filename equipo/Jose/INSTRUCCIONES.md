@@ -3,7 +3,7 @@
 Cuenta GitHub: **Josezx18**. Estación: `mac-jose`.
 Tarea inicial: [issue #16](https://github.com/joseulloa18/firesync/issues/16).
 
-Descarga y descomprime el paquete de tu nombre desde [Releases](https://github.com/joseulloa18/firesync/releases).
+Descarga y descomprime [FIRESYNC-Jose.zip](https://github.com/joseulloa18/firesync/releases/download/estaciones-v1/FIRESYNC-Jose.zip).
 Ejecuta INICIAR.bat (Windows) o INICIAR.command (Mac). Conserva todos los archivos de esta carpeta.
 El primer uso puede requerir instalar herramientas e iniciar sesión en GitHub y OpenCode con TU cuenta.
 No envíes claves por chat ni uses la cuenta del coordinador.

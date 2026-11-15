@@ -610,6 +610,24 @@ main() {
 
   comprobar_gh_autenticacion
 
+  # Identidad local con correo noreply, sin mostrar ni copiar credenciales.
+  local cuenta="" cuenta_id=""
+  cuenta="$(gh api user --jq .login)"
+  if [ "$(minusculas "$cuenta")" != "$(minusculas "$CUENTA_ESTACION")" ]; then
+    error "La cuenta activa no corresponde a esta estacion: $CUENTA_ESTACION"
+    return 1
+  fi
+  if [ -z "$MODO_WORKER" ]; then
+    cuenta_id="$(gh api user --jq .id)"
+    if [ -z "$(git -C "$REPO_DIR" config user.name || true)" ]; then
+      git -C "$REPO_DIR" config user.name "$cuenta"
+    fi
+    if [ -z "$(git -C "$REPO_DIR" config user.email || true)" ]; then
+      git -C "$REPO_DIR" config user.email "${cuenta_id}+${cuenta}@users.noreply.github.com"
+    fi
+    git -C "$REPO_DIR" config credential.https://github.com.helper '!gh auth git-credential'
+  fi
+
   if ! comprobar_opencode; then
     case "$MODO_WORKER" in
       check|dry-run)

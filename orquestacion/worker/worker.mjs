@@ -743,6 +743,7 @@ function runProjectTests({ exec, worktree, log }) {
 // Sube la rama y crea un PR borrador solo si el worktree esta limpio, hay
 // commits por publicar y lint/typecheck/test pasan. Nunca fusiona.
 function publishIssue({ exec, log, repo, worktree, issue, baseBranch }) {
+  verifyWorktree(exec, worktree);
   if (worktreeIsDirty(exec, worktree)) {
     log("ERROR  Hay cambios sin commit; no se publica una tarea parcial.");
     return { published: false, reason: "worktree sucio" };
@@ -1359,10 +1360,11 @@ export async function runWorker(opts, deps = {}) {
           log(`ERROR  Publicacion fallida: ${error.message}`);
           publish = { published: false, reason: error.message };
         }
-        if (publish.published === false && publish.reason !== "sin commits") {
+        if (publish.published === false) {
           failures += 1;
         }
       } else if (dirtyAfter) {
+        failures += 1;
         log("AVISO  Hay cambios sin commit; no se publica una tarea parcial.");
       }
 

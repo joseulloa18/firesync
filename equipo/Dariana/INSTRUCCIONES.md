@@ -3,7 +3,7 @@
 Cuenta GitHub: **DarianaSM15**. Estación: `pc-1-dariana`.
 Tarea inicial: [issue #13](https://github.com/joseulloa18/firesync/issues/13).
 
-Descarga y descomprime el paquete de tu nombre desde [Releases](https://github.com/joseulloa18/firesync/releases).
+Descarga y descomprime [FIRESYNC-Dariana.zip](https://github.com/joseulloa18/firesync/releases/download/estaciones-v1/FIRESYNC-Dariana.zip).
 Ejecuta INICIAR.bat (Windows) o INICIAR.command (Mac). Conserva todos los archivos de esta carpeta.
 El primer uso puede requerir instalar herramientas e iniciar sesión en GitHub y OpenCode con TU cuenta.
 No envíes claves por chat ni uses la cuenta del coordinador.
