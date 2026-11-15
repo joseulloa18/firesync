@@ -1,0 +1,11 @@
+{
+  "repo": "joseulloa18/firesync",
+  "integrationBranch": "main",
+  "defaultModel": "opencode/big-pickle",
+  "stations": [
+    { "id": "pc-1-dariana", "github": "DarianaSM15", "os": "windows", "maxSessions": 2 },
+    { "id": "pc-2-ian", "github": "NunezIan", "os": "windows", "maxSessions": 2 },
+    { "id": "pc-3-yariel", "github": "yarielDR32", "os": "windows", "maxSessions": 2 },
+    { "id": "mac-jose", "github": "Josezx18", "os": "macos", "maxSessions": 2 }
+  ]
+}

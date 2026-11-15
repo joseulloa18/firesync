@@ -1,32 +1,40 @@
 # FIRESYNC — coordinación
 
-Repositorio: https://github.com/joseulloa18/firesync
-Rama de integración: main. Operador: @joseulloa18. Estación PC-1 Windows.
-Coordinador: Codex desktop. Capacidad inicial: tres sesiones ejecutoras aisladas.
+Repositorio: https://github.com/joseulloa18/firesync. Integración: `main`.
+Coordinador Windows: @joseulloa18, Codex desktop. No utilizar Codex CLI.
 
-| Issue | Agente | Rama | Estado |
-|---|---|---|---|
-| #2 Base app | Codex CLI | codex/base-app | en curso |
-| #3 Datos | OpenCode sesión datos | codex/datos | en curso |
-| #4 Esquema | OpenCode sesión esquema | codex/esquema | en curso |
+| Estación | Sistema | Operador GitHub | Agente | Cupos provisionales | Estado |
+|---|---|---|---|---|---|
+| pc-1-dariana | Windows | @DarianaSM15 | OpenCode Desktop | 2 | Pendiente de primer arranque |
+| pc-2-ian | Windows | @NunezIan | OpenCode Desktop | 2 | Pendiente de primer arranque |
+| pc-3-yariel | Windows | @yarielDR32 | OpenCode Desktop | 2 | Pendiente de primer arranque |
+| mac-jose | macOS | @Josezx18 | OpenCode; Codex instalado sin uso | 2 | Invitación de escritura pendiente |
 
-## Sesiones y aislamiento
-- Codex CLI: 01a1dc95-9722-7382-90e1-ebeb032a1a03; worktree nasa-base.
-- OpenCode datos: ses_e236a530bffeJsPI3KoK10YaUI; worktree nasa-datos.
-- OpenCode esquema: ses_e236a5322ffeE7YW0Z7GlM4bqQ; worktree nasa-esquema.
-- Ubicación de worktrees: C:/Users/Josex/.codex/worktrees/ (cada uno tiene su carpeta Nasa app challenge).
-- Sesiones por tarea, sin edición compartida. Integrar solo tras revisión y comprobaciones.
+Los cupos son valores iniciales ajustables, no capacidad medida. Las cuotas pueden
+compartirse por proveedor. El operador debe ejecutar localmente su lanzador y
+completar la autenticación. No se publican correos, claves ni contraseñas.
+El registro legible por el kit está en `equipo.json`.
 
-## Disponibilidad de agentes
-- Codex CLI: autenticado con ChatGPT; no se verificó si es cuenta distinta del desktop.
-- OpenCode: proveedor NVIDIA respondió muy lento; OpenRouter rechazó autenticación (401).
-- Relevo a opencode/big-pickle: respondió y ejecuta tareas en ambas sesiones. Cuotas compartidas de proveedor sin cuantificar.
+## Trabajo central verificado
 
-## Primer hito
-Base local ejecutable, navegación bilingüe, configuración, health, parser/armonización probados y migración inicial revisable. Se mantienen fuera de esta tanda ingesta histórica completa, alertas reales y agente operativo.
+- PRs #5, #8, #9, #11 y #12 integrados. CI de aplicación y PostGIS en verde.
+- Demo pública: https://firesync-eight.vercel.app/es (datos sintéticos).
+- Supabase FIRESYNC creado; migración `20261114000100_initial_core` aplicada.
+- Cliente FIRMS e informes disponibles; aún sin ingesta real ni validación científica.
+- Alertas y agente de IA pendientes.
+- Dos sesiones locales OpenCode preparan Windows/worker y Mac en worktrees separados.
 
-## Pendientes externos
-- Usuarios GitHub del grupo para invitaciones; no se han enviado invitaciones.
-- Supabase/PostGIS, clave FIRMS y muestra real de datos del caso de demo.
-- Selección y validación científica del método; ningún ejemplo sintético cuenta como validación.
-- Sin envíos reales de correo en desarrollo.
+## Proveedores
+
+OpenCode gratuito funciona. NVIDIA Muse Glimmer respondió en revisión.
+Baseten Muse rechazó la clave (403). OpenRouter rechazó autenticación (401);
+si se recupera se permite únicamente `openrouter/openrouter/free`.
+Cada estación conserva sus credenciales y verifica sus modelos disponibles.
+
+## Protocolo distribuido
+
+Un issue por tarea, asignado a un operador y con etiquetas `station:ID` y
+`worker:ready`. Una sesión por worktree `hackathon/issue-N`, sin edición
+compartida ni merge automático. La coordinación revisa e integra.
+El ensayo debe demostrar pruebas y un PR antes de marcar la estación lista.
+Un lanzador descargado no demuestra que la estación esté online.
