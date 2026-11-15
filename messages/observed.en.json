@@ -1,0 +1,20 @@
+{
+  "area": "Dominican Republic and surroundings (query area)",
+  "available": "Latest available days per product (up to 7)",
+  "observed": "Real observations · not confirmed fires",
+  "intro": "Explore NASA FIRMS observations. Available dates may precede today; check each product's period.",
+  "provenance": "Source and actual availability",
+  "downloaded": "Last server download",
+  "records": "records",
+  "unavailable": "Unavailable",
+  "partial": "Incomplete query: some products could not be downloaded. Do not interpret missing data as zero activity.",
+  "limits": "Read-only query, 15-minute cache, no persistent ingestion. Rectangular area, not an administrative boundary. Satellite coverage is not assessed; history and other views may remain demonstrations.",
+  "emptyWarning": "Zero records means this query returned no detections; it does not prove absence of fires. The 24-hour, 3-day and 7-day filters are anchored to download time, not an old observation.",
+  "map": "FIRMS observation map",
+  "list": "Filtered detections",
+  "attribution": "NASA FIRMS · satellite observations |",
+  "unit": "Detections per cell",
+  "empty": "No detections returned for this filter and the queried products.",
+  "failed": "NASA FIRMS could not be queried. Synthetic data is not substituted.",
+  "displayLimit": "The list shows up to 200 records and the map up to 250 markers. Intensity uses every filtered record."
+}

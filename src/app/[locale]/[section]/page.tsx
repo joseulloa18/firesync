@@ -1,3 +1,7 @@
+import { getObservedRecent } from "@/lib/firms/observed-recent";
+import { ObservedRecent } from "@/components/observed-recent";
+import observedEs from "../../../../messages/observed.es.json";
+import observedEn from "../../../../messages/observed.en.json";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { HistoryDashboard, RecentDashboard } from "@/components/dashboard";
@@ -26,8 +30,10 @@ export default async function SectionPage({
   const t = dictionaries[locale];
   const key = section as (typeof sections)[number];
   const title = t.nav[key];
-  const intro = t.sectionIntros[key];
   const search = await searchParams;
+  const observed = section === "actualidad" ? await getObservedRecent() : null;
+  const observedCopy = locale === "es" ? observedEs : observedEn;
+  const intro = observed ? observedCopy.intro : t.sectionIntros[key];
   const { caso, zona } = search;
   const initialZone = typeof zona === "string" ? zona : undefined;
   const responseContext = parseResponseContext(search);
@@ -42,7 +48,7 @@ export default async function SectionPage({
   return (
     <>
       <section className="page-heading">
-        <p className="eyebrow">{t.demo}</p>
+        <p className="eyebrow">{observed ? observedCopy.observed : t.demo}</p>
         <h1>{title}</h1>
         <p>{intro}</p>
       </section>
@@ -64,7 +70,11 @@ export default async function SectionPage({
           </section>
         </>
       ) : section === "actualidad" ? (
-        <RecentDashboard locale={locale} initialZone={initialZone} />
+        observed ? (
+          <ObservedRecent locale={locale} snapshot={observed} />
+        ) : (
+          <RecentDashboard locale={locale} initialZone={initialZone} />
+        )
       ) : section === "prevencion" || section === "respuesta" ? (
         <PreventionResponseView
           locale={locale}

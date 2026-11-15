@@ -182,7 +182,10 @@ function MapCard({
           sensor={sensor}
           day={day}
           detections={records}
-          onSelect={onSelect}
+          onSelect={(detection) => {
+            const record = records?.find((item) => item.id === detection.id);
+            if (record) onSelect?.(record);
+          }}
           onSensorChange={onSensorChange}
           activity={activity}
         />
