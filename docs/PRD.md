@@ -146,3 +146,12 @@ Prioridad: **P0** núcleo del reto, **P1** valor central de la propuesta, **P2**
 | Falta de datos oficiales de activos | Datos demo etiquetados; carga y validación por el equipo |
 | Respuestas del agente erróneas en temas de seguridad | Base de conocimiento curada, aviso del 9-1-1, evaluación con casos de prueba, aprobación humana a instituciones |
 | Alcance excesivo para el tiempo disponible | Línea de corte P0 + P1 en `ROADMAP.md` |
+
+## Ampliación funcional acordada — 2026-11-15
+
+La especificación detallada y la auditoría del prototipo están en
+[ALCANCE-FUNCIONAL-2026-11-15.md](ALCANCE-FUNCIONAL-2026-11-15.md).
+Incluye boletín de incendios con confirmación y fuente separadas de detecciones,
+ranking comparable, orientación pública en Respuesta, zonas privadas y alertas,
+laboratorio por rondas y asistente global con política de efectos. Es alcance
+planificado, no certificación de funciones operativas ni excepción a las fases 0–6.

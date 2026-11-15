@@ -1,0 +1,43 @@
+/*
+ * Identidad visual de FireSync.
+ *
+ * Archivo propio de la tarea de marca (issue #23). No redefine la maqueta
+ * compartida de globals.css: solo fija el tamaño del logo aportado por el
+ * usuario y evita que la imagen se deforme o se salga del encabezado.
+ */
+
+/* Logo del encabezado: ancho automático y altura fija. Al no declarar un
+   ancho en píxeles, la proporción original 919×887 se conserva intacta. */
+.brand-logo {
+  display: block;
+  flex: 0 0 auto;
+  width: auto;
+  height: 44px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* El nombre visible es solo «FireSync»; ya no lleva subtítulo debajo. */
+.brand-name {
+  display: block;
+}
+
+/* Repetición discreta de la marca en el pie de página. */
+.footer-brand-logo {
+  display: block;
+  flex: 0 0 auto;
+  width: auto;
+  height: 20px;
+  object-fit: contain;
+}
+
+@media (max-width: 720px) {
+  /* Cabecera usable a 390 px: el logo se reduce sin recortarse. */
+  .brand-logo {
+    height: 38px;
+  }
+
+  .footer-brand-logo {
+    height: 18px;
+  }
+}

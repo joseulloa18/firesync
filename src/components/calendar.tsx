@@ -1,64 +1,48 @@
 "use client";
 import { Icon } from "./icon";
 import { dictionaries, type Locale } from "./messages";
+import type {
+  HistoryMonthSelection,
+  HistoryMonthSummary,
+} from "@/lib/history/demo-history";
 
-// Reproducible UI fixture. It is never satellite data or a harmonized index.
-export const demoYears = [2025, 2024, 2023, 2022, 2021, 2020] as const;
+export type { HistoryMonthSelection };
 
-export type MonthSelection = {
-  year: number;
-  month: number;
-  level: number;
-  days: number;
-  daily: number[];
-  total: number;
-};
-
-export function monthLevel(year: number, month: number) {
-  const row = demoYears.indexOf(year as (typeof demoYears)[number]);
-  const safeRow = row < 0 ? 0 : row;
-  const illustrativeSeason = [0, 0, 1, 1, 2, 2, 3, 3, 2, 1, 1, 0];
-  // A visual fixture only: this is not a measured seasonal pattern.
-  const variation = safeRow === 2 && month >= 4 && month <= 9 ? 1 : 0;
-  return Math.min(3, illustrativeSeason[month] + variation);
-}
-
-export function createMonthSelection(
-  year: number,
-  month: number,
-): MonthSelection {
-  const level = monthLevel(year, month);
-  const days = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-  const daily = Array.from({ length: days }, (_, index) => {
-    const seed = (year * 13 + month * 17 + (index + 1) * 7 + level * 5) % 11;
-    if (level === 0) return seed > 8 ? 1 : 0;
-    return (seed % (level + 2)) + (seed % 4 === 0 ? 1 : 0);
-  });
-  return {
-    year,
-    month,
-    level,
-    days,
-    daily,
-    total: daily.reduce((sum, value) => sum + value, 0),
-  };
+function summaryKey(year: number, month: number) {
+  return `${year}-${month}`;
 }
 
 export function Calendar({
   locale,
-  years = demoYears,
+  years,
+  summaries,
   selected,
   onSelect,
   showDetail = false,
+  subtitle,
 }: {
   locale: Locale;
-  years?: readonly number[];
-  selected: MonthSelection | null;
-  onSelect: (selection: MonthSelection) => void;
+  years: readonly number[];
+  /** Resúmenes puros de `src/lib/history/demo-history.ts`. */
+  summaries: readonly HistoryMonthSummary[];
+  selected: HistoryMonthSelection | null;
+  onSelect: (selection: HistoryMonthSelection) => void;
   showDetail?: boolean;
+  subtitle?: string;
 }) {
   const t = dictionaries[locale];
+  // Filas de año más reciente a más antiguo; los selectores de año, en cambio,
+  // muestran 2000 primero (ver dashboard).
   const orderedYears = [...years].sort((a, b) => b - a);
+  const summaryByKey = new Map(
+    summaries.map((summary) => [
+      summaryKey(summary.year, summary.month),
+      summary,
+    ]),
+  );
+  const selectedSummary = selected
+    ? summaryByKey.get(summaryKey(selected.year, selected.month))
+    : undefined;
 
   return (
     <section className="card calendar-card" aria-labelledby="calendar-title">
@@ -66,7 +50,7 @@ export function Calendar({
         <div>
           <p className="eyebrow">{t.demo}</p>
           <h2 id="calendar-title">{t.calendarTitle}</h2>
-          <p className="card-subtitle">{t.calendarSubtitle}</p>
+          <p className="card-subtitle">{subtitle ?? t.calendarSubtitle}</p>
         </div>
         <span className="card-icon" aria-hidden="true">
           <Icon name="calendar" size={21} />
@@ -96,21 +80,42 @@ export function Calendar({
               <tr key={year}>
                 <th scope="row">{year}</th>
                 {t.months.map((month, index) => {
-                  const selection = createMonthSelection(year, index);
-                  const level = selection.level;
+                  const summary = summaryByKey.get(summaryKey(year, index));
+                  if (!summary) {
+                    return (
+                      <td key={month}>
+                        <span className="heat is-empty" aria-hidden="true">
+                          ·
+                        </span>
+                      </td>
+                    );
+                  }
+                  const isSelected =
+                    selected?.year === year && selected.month === index;
+                  const label = summary.future
+                    ? `${month} ${year}: ${t.monthFuture}`
+                    : `${month} ${year}: ${t.levels[summary.level]}`;
                   return (
                     <td key={month}>
                       <button
                         type="button"
-                        className={`heat level-${level}`}
-                        aria-label={`${month} ${year}: ${t.levels[level]}`}
-                        aria-pressed={
-                          selected?.year === year && selected.month === index
+                        className={`heat level-${summary.level}${
+                          summary.future ? " is-future" : ""
+                        }${summary.partial ? " is-partial" : ""}`}
+                        aria-label={label}
+                        aria-pressed={isSelected}
+                        title={
+                          summary.future
+                            ? t.monthFuture
+                            : `${t.monthTotal}: ${summary.total}`
                         }
-                        onClick={() => onSelect(selection)}
+                        disabled={summary.future}
+                        onClick={() => onSelect({ year, month: index })}
                       >
                         <span aria-hidden="true">
-                          {["·", "−", "+", "◆"][level]}
+                          {summary.future
+                            ? "×"
+                            : ["·", "−", "+", "◆"][summary.level]}
                         </span>
                       </button>
                     </td>
@@ -127,18 +132,25 @@ export function Calendar({
           {[0, 1, 2, 3].map((level) => (
             <i className={`level-${level}`} key={level} />
           ))}
+          <i className="level-future" />
         </div>
         <span>{t.more}</span>
       </div>
+      <p className="helper history-future-note">
+        <span className="legend-future" aria-hidden="true">
+          ×
+        </span>{" "}
+        {t.monthFuture}
+      </p>
       {showDetail && (
         <div className="month-detail" aria-live="polite">
-          {selected ? (
+          {selectedSummary ? (
             <>
               <p className="eyebrow">{t.detail}</p>
               <h3>
-                {t.months[selected.month]} {selected.year}
+                {t.months[selectedSummary.month]} {selectedSummary.year}
               </h3>
-              <p>{t.levels[selected.level]}</p>
+              <p>{t.levels[selectedSummary.level]}</p>
               <p>{t.detailNote}</p>
             </>
           ) : (
