@@ -5,7 +5,7 @@ import { FireMap } from "./fire-map";
 import type { DemoDetection, DemoSensorFilter } from "@/content/map-demo";
 import { Calendar } from "./calendar";
 import { DataProvenance } from "./data-provenance";
-import { Icon, type IconName } from "./icon";
+import { Icon } from "./icon";
 import { dictionaries, type Locale } from "./messages";
 import { createSyntheticProvenance } from "@/lib/provenance";
 import {
@@ -15,7 +15,6 @@ import {
   createMonthSummary,
   createPeriodRecords,
   createRangeSummaries,
-  defaultHistoryRange,
   filterHistoryRecords,
   historyYearOptions,
   utcDayOf,
@@ -136,13 +135,6 @@ function historyCsv(
   }
 
   return lines;
-}
-
-function zoneCsv(t: Dict, zone: string) {
-  const now = new Date();
-  const { fromYear, toYear } = defaultHistoryRange(now);
-  const summaries = createRangeSummaries(fromYear, toYear, { now });
-  return historyCsv(t, zone, fromYear, toYear, "all", summaries, null);
 }
 
 function MapCard({
@@ -1033,157 +1025,6 @@ export function RecentDashboard({
       </section>
 
       <DataProvenance locale={locale} provenance={provenance} />
-    </>
-  );
-}
-
-const resourceIcons: IconName[] = ["shield", "alert", "bell"];
-const resourceTitles = [
-  "resourcePrevention",
-  "resourceResponse",
-  "resourceReport",
-] as const;
-
-export function PreventionDashboard({
-  locale,
-  initialZone,
-}: {
-  locale: Locale;
-  initialZone?: string;
-}) {
-  const t = dictionaries[locale];
-  const [zone, setZone] = useState(() => initialZoneIndex(initialZone));
-  const plan =
-    zone === 0
-      ? [
-          { month: 2, priority: t.priorityHigh },
-          { month: 3, priority: t.priorityMedium },
-          { month: 4, priority: t.priorityMedium },
-        ]
-      : zone === 1
-        ? [
-            { month: 4, priority: t.priorityHigh },
-            { month: 5, priority: t.priorityHigh },
-            { month: 6, priority: t.priorityLow },
-          ]
-        : [
-            { month: 1, priority: t.priorityMedium },
-            { month: 2, priority: t.priorityHigh },
-            { month: 3, priority: t.priorityLow },
-          ];
-
-  return (
-    <>
-      <section className="card filter-bar" aria-label={t.filters}>
-        <div className="filter-grid">
-          <label className="field">
-            <span>{t.filterZone}</span>
-            <select
-              value={zoneIds[zone]}
-              onChange={(event) =>
-                setZone(initialZoneIndex(event.target.value))
-              }
-            >
-              {zoneIds.map((id, index) => (
-                <option key={id} value={id}>
-                  {t.zoneOptions[index]}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </section>
-
-      <section className="prevention-grid" aria-label={t.preventionTitle}>
-        <article className="card preparation-card">
-          <div className="card-head">
-            <div>
-              <p className="eyebrow">{t.demo}</p>
-              <h2>{t.preventionTitle}</h2>
-              <p className="card-subtitle">{t.preventionSubtitle}</p>
-            </div>
-            <span className="card-icon" aria-hidden="true">
-              <Icon name="calendar" size={21} />
-            </span>
-          </div>
-          <div className="preparation-list">
-            {plan.map((item) => {
-              const level = createMonthSummary(2025, item.month, {
-                zoneIndex: zone,
-              }).level;
-              return (
-                <div className="preparation-row" key={item.month}>
-                  <div>
-                    <strong>{t.months[item.month]}</strong>
-                    <span>{t.levels[level]}</span>
-                  </div>
-                  <span className="priority-pill">{item.priority}</span>
-                </div>
-              );
-            })}
-          </div>
-          <p className="helper">{t.preparationNote}</p>
-        </article>
-
-        <div className="resources-stack">
-          <article className="card resources-card">
-            <div className="card-head">
-              <div>
-                <p className="eyebrow">{t.pending}</p>
-                <h2>{t.resourcesTitle}</h2>
-                <p className="card-subtitle">{t.resourcesEmptyTitle}</p>
-              </div>
-              <span className="card-icon" aria-hidden="true">
-                <Icon name="shield" size={21} />
-              </span>
-            </div>
-            <p className="empty-note">{t.resourcesEmptyText}</p>
-            <div className="resource-actions">
-              <Link
-                className="button secondary"
-                href={`/${locale}/mapa?zona=${zoneIds[zone]}`}
-              >
-                <Icon name="map" size={16} />
-                {t.viewHistory}
-              </Link>
-              <button
-                type="button"
-                className="button primary"
-                onClick={() =>
-                  downloadCsv(
-                    `firesync-resumen-${zoneIds[zone]}-demo.csv`,
-                    zoneCsv(t, t.zoneOptions[zone]),
-                  )
-                }
-              >
-                <Icon name="download" size={16} />
-                {t.downloadZoneSummary}
-              </button>
-              <a className="button emergency" href="tel:911">
-                <Icon name="alert" size={16} />
-                {t.emergencyCall}
-              </a>
-            </div>
-            <p className="helper">{t.demoFileNote}</p>
-          </article>
-
-          <div className="resource-grid">
-            {resourceTitles.map((key, index) => (
-              <article className="resource-card" key={key}>
-                <span className="resource-icon" aria-hidden="true">
-                  <Icon name={resourceIcons[index]} size={18} />
-                </span>
-                <h3>{t[key]}</h3>
-                <p>{t.resourcesEmptyText}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-      <p className="emergency-banner">
-        <Icon name="alert" size={18} />
-        <span>{t.emergency}</span>
-      </p>
     </>
   );
 }
