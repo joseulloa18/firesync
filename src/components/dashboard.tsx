@@ -920,9 +920,16 @@ export function RecentDashboard({
               </p>
               <Link
                 className="inline-link"
-                href={`/${locale}/prevencion?zona=${zoneIds[zone]}`}
+                href={`/${locale}/prevencion?zona=${zoneIds[zone]}&deteccion=${encodeURIComponent(active.id)}`}
               >
                 {t.viewPrevention}
+                <Icon name="arrowRight" size={15} />
+              </Link>
+              <Link
+                className="inline-link"
+                href={`/${locale}/respuesta?zona=${zoneIds[zone]}&deteccion=${encodeURIComponent(active.id)}`}
+              >
+                {t.preventionResponse.viewResponse}
                 <Icon name="arrowRight" size={15} />
               </Link>
             </>
