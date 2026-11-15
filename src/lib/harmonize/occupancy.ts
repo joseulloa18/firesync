@@ -1,6 +1,10 @@
-import type { SensorFamily } from '../firms/types';
-import { selectSeriesDetections } from './filters';
-import type { CellDayOccupancy, GriddedDetection, SeriesSelectionOptions } from './types';
+import type { SensorFamily } from "../firms/types";
+import { selectSeriesDetections } from "./filters";
+import type {
+  CellDayOccupancy,
+  GriddedDetection,
+  SeriesSelectionOptions,
+} from "./types";
 
 export function computeCellDayOccupancy(
   detections: readonly GriddedDetection[],
@@ -25,7 +29,9 @@ export function computeCellDayOccupancy(
     existing.nDetections += 1;
     if (detection.frp !== null) {
       existing.maxFrp =
-        existing.maxFrp === null ? detection.frp : Math.max(existing.maxFrp, detection.frp);
+        existing.maxFrp === null
+          ? detection.frp
+          : Math.max(existing.maxFrp, detection.frp);
     }
   }
 

@@ -3,8 +3,8 @@ import {
   HARMONIZATION_METHOD_VERSION,
   HARMONIZATION_START_MONTH,
   HARMONIZATION_START_YEAR,
-} from './config';
-import type { MonthlyFamilyTotals } from './types';
+} from "./config";
+import type { MonthlyFamilyTotals } from "./types";
 
 export interface CalibrationMonth {
   year: number;
@@ -27,11 +27,11 @@ export interface CalibrationOptions {
 }
 
 export type CalibrationStatus =
-  | 'ok'
-  | 'no_overlap'
-  | 'zero_denominator'
-  | 'duplicate_month'
-  | 'invalid_input';
+  | "ok"
+  | "no_overlap"
+  | "zero_denominator"
+  | "duplicate_month"
+  | "invalid_input";
 
 export interface CalibrationResult {
   factor: number | null;
@@ -47,7 +47,7 @@ export interface CalibrationResult {
   reason: string | null;
 }
 
-export type HarmonizationStrategy = 'viirs_from_2012' | 'modis_anchor';
+export type HarmonizationStrategy = "viirs_from_2012" | "modis_anchor";
 
 export interface HarmonizedIndexInput {
   year: number;
@@ -61,7 +61,7 @@ export interface HarmonizedIndexInput {
 
 export interface HarmonizedIndexResult {
   index: number | null;
-  sensor: 'MODIS' | 'VIIRS' | null;
+  sensor: "MODIS" | "VIIRS" | null;
   factorApplied: boolean;
 }
 
@@ -84,11 +84,11 @@ function isValidPeriod(period: CalibrationPeriod): boolean {
 }
 
 function validValue(value: number | null | undefined): value is number {
-  return typeof value === 'number' && Number.isFinite(value) && value >= 0;
+  return typeof value === "number" && Number.isFinite(value) && value >= 0;
 }
 
 function periodDate(period: CalibrationPeriod): string {
-  return `${String(period.year).padStart(4, '0')}-${String(period.month).padStart(2, '0')}-01`;
+  return `${String(period.year).padStart(4, "0")}-${String(period.month).padStart(2, "0")}-01`;
 }
 
 function coefficientOfDetermination(
@@ -133,13 +133,14 @@ export function calibrateViirsToModis(
       periodEnd: null,
       totalModis: 0,
       totalViirs: 0,
-      status: 'invalid_input',
-      reason: 'Overlap start or end is not a valid year and month.',
+      status: "invalid_input",
+      reason: "Overlap start or end is not a valid year and month.",
     };
   }
 
   const startOrdinal = monthOrdinal(start);
-  const endOrdinal = end === null ? Number.POSITIVE_INFINITY : monthOrdinal(end);
+  const endOrdinal =
+    end === null ? Number.POSITIVE_INFINITY : monthOrdinal(end);
   if (startOrdinal > endOrdinal) {
     return {
       factor: null,
@@ -151,8 +152,8 @@ export function calibrateViirsToModis(
       periodEnd: null,
       totalModis: 0,
       totalViirs: 0,
-      status: 'invalid_input',
-      reason: 'Overlap start is after overlap end.',
+      status: "invalid_input",
+      reason: "Overlap start is after overlap end.",
     };
   }
 
@@ -174,7 +175,7 @@ export function calibrateViirsToModis(
 
   const seenMonths = new Set<string>();
   for (const month of inPeriod) {
-    const key = `${month.year}-${String(month.month).padStart(2, '0')}`;
+    const key = `${month.year}-${String(month.month).padStart(2, "0")}`;
     if (seenMonths.has(key)) {
       return {
         factor: null,
@@ -186,7 +187,7 @@ export function calibrateViirsToModis(
         periodEnd: null,
         totalModis: 0,
         totalViirs: 0,
-        status: 'duplicate_month',
+        status: "duplicate_month",
         reason: `Duplicate calibration month ${key}.`,
       };
     }
@@ -195,7 +196,8 @@ export function calibrateViirsToModis(
 
   const matched = inPeriod
     .filter(
-      (month) => validValue(month.modisCellDays) && validValue(month.viirsCellDays),
+      (month) =>
+        validValue(month.modisCellDays) && validValue(month.viirsCellDays),
     )
     .sort((left, right) => monthOrdinal(left) - monthOrdinal(right));
 
@@ -210,8 +212,8 @@ export function calibrateViirsToModis(
       periodEnd: null,
       totalModis: 0,
       totalViirs: 0,
-      status: 'no_overlap',
-      reason: 'No matched months with valid MODIS and VIIRS CDO values.',
+      status: "no_overlap",
+      reason: "No matched months with valid MODIS and VIIRS CDO values.",
     };
   }
 
@@ -237,8 +239,8 @@ export function calibrateViirsToModis(
       periodEnd: periodDate(last),
       totalModis,
       totalViirs,
-      status: 'zero_denominator',
-      reason: 'VIIRS CDO total is zero over the matched overlap months.',
+      status: "zero_denominator",
+      reason: "VIIRS CDO total is zero over the matched overlap months.",
     };
   }
 
@@ -261,7 +263,7 @@ export function calibrateViirsToModis(
     periodEnd: periodDate(last),
     totalModis,
     totalViirs,
-    status: 'ok',
+    status: "ok",
     reason: null,
   };
 }
@@ -283,23 +285,24 @@ export function harmonizeMonthlyIndex(
   const ordinal = monthOrdinal(input);
   const factorReady =
     input.factor !== null && Number.isFinite(input.factor) && input.factor >= 0;
-  const strategy = input.strategy ?? 'viirs_from_2012';
+  const strategy = input.strategy ?? "viirs_from_2012";
   const firstHarmonizedOrdinal = monthOrdinal(DEFAULT_OVERLAP_START);
 
-  if (strategy === 'modis_anchor') {
+  if (strategy === "modis_anchor") {
     const hasModis =
-      input.modisAvailable ?? (input.modisCellDays !== null && Number.isFinite(input.modisCellDays));
+      input.modisAvailable ??
+      (input.modisCellDays !== null && Number.isFinite(input.modisCellDays));
     if (hasModis) {
       return {
         index: input.modisCellDays,
-        sensor: 'MODIS',
+        sensor: "MODIS",
         factorApplied: false,
       };
     }
     if (factorReady && input.viirsCellDays !== null) {
       return {
         index: (input.factor as number) * input.viirsCellDays,
-        sensor: 'VIIRS',
+        sensor: "VIIRS",
         factorApplied: true,
       };
     }
@@ -309,7 +312,7 @@ export function harmonizeMonthlyIndex(
   if (ordinal < firstHarmonizedOrdinal) {
     return {
       index: input.modisCellDays,
-      sensor: input.modisCellDays === null ? null : 'MODIS',
+      sensor: input.modisCellDays === null ? null : "MODIS",
       factorApplied: false,
     };
   }
@@ -320,7 +323,7 @@ export function harmonizeMonthlyIndex(
 
   return {
     index: (input.factor as number) * input.viirsCellDays,
-    sensor: 'VIIRS',
+    sensor: "VIIRS",
     factorApplied: true,
   };
 }

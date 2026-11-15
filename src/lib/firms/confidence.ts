@@ -1,4 +1,4 @@
-import type { ConfidenceClass, SensorFamily } from './types';
+import type { ConfidenceClass, SensorFamily } from "./types";
 
 const CONFIDENCE_RANK: Record<ConfidenceClass, number> = {
   low: 0,
@@ -19,7 +19,7 @@ export function meetsMinConfidence(
 
 export function normalizeModisConfidence(raw: string): ConfidenceClass | null {
   const trimmed = raw.trim();
-  if (trimmed === '') {
+  if (trimmed === "") {
     return null;
   }
   const value = Number(trimmed);
@@ -27,24 +27,24 @@ export function normalizeModisConfidence(raw: string): ConfidenceClass | null {
     return null;
   }
   if (value < 30) {
-    return 'low';
+    return "low";
   }
   if (value < 80) {
-    return 'nominal';
+    return "nominal";
   }
-  return 'high';
+  return "high";
 }
 
 export function normalizeViirsConfidence(raw: string): ConfidenceClass | null {
   const value = raw.trim().toLowerCase();
-  if (value === 'l' || value === 'low') {
-    return 'low';
+  if (value === "l" || value === "low") {
+    return "low";
   }
-  if (value === 'n' || value === 'nominal') {
-    return 'nominal';
+  if (value === "n" || value === "nominal") {
+    return "nominal";
   }
-  if (value === 'h' || value === 'high') {
-    return 'high';
+  if (value === "h" || value === "high") {
+    return "high";
   }
   return null;
 }
@@ -53,7 +53,7 @@ export function normalizeConfidence(
   raw: string,
   family: SensorFamily,
 ): ConfidenceClass | null {
-  return family === 'MODIS'
+  return family === "MODIS"
     ? normalizeModisConfidence(raw)
     : normalizeViirsConfidence(raw);
 }

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from "vitest";
 import {
   assignCellIds,
   cellBounds,
@@ -7,16 +7,16 @@ import {
   dedupeDetections,
   detectionDedupeKey,
   lonLatToCell,
-} from '../../src/lib/harmonize';
-import { makeDetection } from './helpers';
+} from "../../src/lib/harmonize";
+import { makeDetection } from "./helpers";
 
-describe('0.01 degree grid', () => {
-  it('applies the documented cell formula', () => {
+describe("0.01 degree grid", () => {
+  it("applies the documented cell formula", () => {
     const cell = lonLatToCell(-69.9132, 18.4715);
     expect(cell).toEqual({ ix: 11008, iy: 10847, cellId: 390503008 });
   });
 
-  it('maps the corners to valid grid indexes without overflow collisions', () => {
+  it("maps the corners to valid grid indexes without overflow collisions", () => {
     expect(lonLatToCell(-180, -90)).toEqual({ ix: 0, iy: 0, cellId: 0 });
     expect(lonLatToCell(180, 90)).toEqual({
       ix: 35999,
@@ -25,7 +25,7 @@ describe('0.01 degree grid', () => {
     });
   });
 
-  it('round-trips cell ids and returns cell bounds and centroids', () => {
+  it("round-trips cell ids and returns cell bounds and centroids", () => {
     const cell = lonLatToCell(-69.9132, 18.4715);
     expect(cellIdToGridCell(cell.cellId)).toEqual(cell);
     expect(cellCentroid(cell)).toEqual({
@@ -40,7 +40,7 @@ describe('0.01 degree grid', () => {
     });
   });
 
-  it('rejects invalid coordinates and cell ids', () => {
+  it("rejects invalid coordinates and cell ids", () => {
     expect(() => lonLatToCell(-181, 0)).toThrow(RangeError);
     expect(() => lonLatToCell(0, 91)).toThrow(RangeError);
     expect(() => lonLatToCell(Number.NaN, 0)).toThrow(RangeError);
@@ -49,29 +49,35 @@ describe('0.01 degree grid', () => {
     expect(() => cellIdToGridCell(1.5)).toThrow(RangeError);
   });
 
-  it('assigns a cell id while preserving the detection', () => {
+  it("assigns a cell id while preserving the detection", () => {
     const detection = makeDetection();
     const [gridded] = assignCellIds([detection]);
-    expect(gridded?.cellId).toBe(lonLatToCell(detection.longitude, detection.latitude).cellId);
+    expect(gridded?.cellId).toBe(
+      lonLatToCell(detection.longitude, detection.latitude).cellId,
+    );
     expect(gridded?.acqAt).toBe(detection.acqAt);
   });
 });
 
-describe('detection deduplication', () => {
-  it('deduplicates by satellite, acquisition time, latitude and longitude', () => {
-    const first = makeDetection({ satellite: 'S-NPP', sensor: 'VIIRS', source: 'VIIRS_SNPP_SP' });
+describe("detection deduplication", () => {
+  it("deduplicates by satellite, acquisition time, latitude and longitude", () => {
+    const first = makeDetection({
+      satellite: "S-NPP",
+      sensor: "VIIRS",
+      source: "VIIRS_SNPP_SP",
+    });
     const duplicate = makeDetection({
-      satellite: 'NPP',
-      sensor: 'VIIRS',
-      source: 'VIIRS_SNPP_NRT',
-      confidence: 'nominal',
+      satellite: "NPP",
+      sensor: "VIIRS",
+      source: "VIIRS_SNPP_NRT",
+      confidence: "nominal",
     });
     const differentTime = makeDetection({
-      satellite: 'S-NPP',
-      sensor: 'VIIRS',
-      source: 'VIIRS_SNPP_SP',
-      acqAt: '2024-03-01T00:05:00.000Z',
-      acqTime: '0005',
+      satellite: "S-NPP",
+      sensor: "VIIRS",
+      source: "VIIRS_SNPP_SP",
+      acqAt: "2024-03-01T00:05:00.000Z",
+      acqTime: "0005",
     });
 
     expect(detectionDedupeKey(first)).toBe(detectionDedupeKey(duplicate));
@@ -79,19 +85,19 @@ describe('detection deduplication', () => {
     expect(result.unique).toHaveLength(2);
     expect(result.duplicateCount).toBe(1);
     expect(result.duplicates[0]).toBe(duplicate);
-    expect(result.unique[0]?.source).toBe('VIIRS_SNPP_SP');
+    expect(result.unique[0]?.source).toBe("VIIRS_SNPP_SP");
   });
 
-  it('does not merge two satellites observing at the same time and place', () => {
-    const terra = makeDetection({ satellite: 'Terra' });
-    const aqua = makeDetection({ satellite: 'Aqua' });
+  it("does not merge two satellites observing at the same time and place", () => {
+    const terra = makeDetection({ satellite: "Terra" });
+    const aqua = makeDetection({ satellite: "Aqua" });
     const result = dedupeDetections([terra, aqua]);
 
     expect(result.unique).toHaveLength(2);
     expect(result.duplicateCount).toBe(0);
   });
 
-  it('normalizes negative zero in the key', () => {
+  it("normalizes negative zero in the key", () => {
     const zero = makeDetection({ longitude: 0 });
     const negativeZero = makeDetection({ longitude: -0 });
     expect(detectionDedupeKey(zero)).toBe(detectionDedupeKey(negativeZero));

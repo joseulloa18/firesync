@@ -1,9 +1,9 @@
-import { MIN_ACTIVITY_CDO, MIN_REFERENCE_YEARS } from './config';
+import { MIN_ACTIVITY_CDO, MIN_REFERENCE_YEARS } from "./config";
 import type {
   MonthStatus,
   ReferenceObservation,
   ReferenceStats,
-} from './types';
+} from "./types";
 
 export interface LeaveOneOutTarget {
   year: number;
@@ -20,10 +20,10 @@ export interface MonthClassification {
   percentileRank: number | null;
   ratioToMedian: number | null;
   reason:
-    | 'insufficient_reference'
-    | 'duplicate_reference_year'
-    | 'low_activity'
-    | 'missing_value'
+    | "insufficient_reference"
+    | "duplicate_reference_year"
+    | "low_activity"
+    | "missing_value"
     | null;
 }
 
@@ -38,9 +38,12 @@ function finiteValues(values: readonly number[]): number[] {
   return values.filter((value) => Number.isFinite(value));
 }
 
-export function quantileSorted(sortedValues: readonly number[], probability: number): number | null {
+export function quantileSorted(
+  sortedValues: readonly number[],
+  probability: number,
+): number | null {
   if (!Number.isFinite(probability) || probability < 0 || probability > 1) {
-    throw new RangeError('Quantile probability must be between 0 and 1.');
+    throw new RangeError("Quantile probability must be between 0 and 1.");
   }
   if (sortedValues.length === 0) {
     return null;
@@ -57,11 +60,19 @@ export function quantileSorted(sortedValues: readonly number[], probability: num
   return lower + (upper - lower) * fraction;
 }
 
-export function quantile(values: readonly number[], probability: number): number | null {
-  return quantileSorted(finiteValues(values).sort((left, right) => left - right), probability);
+export function quantile(
+  values: readonly number[],
+  probability: number,
+): number | null {
+  return quantileSorted(
+    finiteValues(values).sort((left, right) => left - right),
+    probability,
+  );
 }
 
-export function computeReferenceStats(values: readonly number[]): ReferenceStats {
+export function computeReferenceStats(
+  values: readonly number[],
+): ReferenceStats {
   const sorted = finiteValues(values).sort((left, right) => left - right);
   if (sorted.length === 0) {
     return {
@@ -94,7 +105,10 @@ function dedupedReferenceValues(
   const duplicateYears = new Set<number>();
 
   for (const observation of history) {
-    if (observation.month !== target.month || observation.year === target.year) {
+    if (
+      observation.month !== target.month ||
+      observation.year === target.year
+    ) {
       continue;
     }
     if (!includePartial && observation.isPartial === true) {
@@ -111,7 +125,9 @@ function dedupedReferenceValues(
 
   return {
     values: Array.from(byYear.values()),
-    duplicateYears: Array.from(duplicateYears).sort((left, right) => left - right),
+    duplicateYears: Array.from(duplicateYears).sort(
+      (left, right) => left - right,
+    ),
   };
 }
 
@@ -121,7 +137,8 @@ export function leaveOneOutReference(
   options: LeaveOneOutOptions = {},
 ): ReferenceStats {
   return computeReferenceStats(
-    dedupedReferenceValues(history, target, options.includePartial === true).values,
+    dedupedReferenceValues(history, target, options.includePartial === true)
+      .values,
   );
 }
 
@@ -151,7 +168,10 @@ export function classifyMonthLeaveOneOut(
   const minReferenceYears = input.minReferenceYears ?? MIN_REFERENCE_YEARS;
   const minActivity = input.minActivity ?? MIN_ACTIVITY_CDO;
   const reference = leaveOneOutReference(input.history, input);
-  const { values, duplicateYears } = dedupedReferenceValues(input.history, input);
+  const { values, duplicateYears } = dedupedReferenceValues(
+    input.history,
+    input,
+  );
   const hasValue = input.value !== null && Number.isFinite(input.value);
   const rank = hasValue ? percentileRank(input.value as number, values) : null;
   const ratio =
@@ -161,41 +181,41 @@ export function classifyMonthLeaveOneOut(
 
   if (duplicateYears.length > 0) {
     return {
-      status: 'insufficient',
+      status: "insufficient",
       reference,
       percentileRank: rank,
       ratioToMedian: ratio,
-      reason: 'duplicate_reference_year',
+      reason: "duplicate_reference_year",
     };
   }
 
   if (!hasValue) {
     return {
-      status: 'insufficient',
+      status: "insufficient",
       reference,
       percentileRank: null,
       ratioToMedian: null,
-      reason: 'missing_value',
+      reason: "missing_value",
     };
   }
 
   if (reference.nYears < minReferenceYears || reference.median === null) {
     return {
-      status: 'insufficient',
+      status: "insufficient",
       reference,
       percentileRank: rank,
       ratioToMedian: ratio,
-      reason: 'insufficient_reference',
+      reason: "insufficient_reference",
     };
   }
 
   if (reference.median < minActivity) {
     return {
-      status: 'insufficient',
+      status: "insufficient",
       reference,
       percentileRank: rank,
       ratioToMedian: ratio,
-      reason: 'low_activity',
+      reason: "low_activity",
     };
   }
 
@@ -205,13 +225,13 @@ export function classifyMonthLeaveOneOut(
   const p90 = reference.p90 as number;
   let status: MonthStatus;
   if (value < p25) {
-    status = 'below_usual';
+    status = "below_usual";
   } else if (value <= p75) {
-    status = 'usual';
+    status = "usual";
   } else if (value <= p90) {
-    status = 'above_usual';
+    status = "above_usual";
   } else {
-    status = 'exceptional';
+    status = "exceptional";
   }
 
   return {

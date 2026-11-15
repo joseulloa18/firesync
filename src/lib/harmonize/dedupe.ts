@@ -1,9 +1,9 @@
-import { canonicalSatelliteName } from '../firms/products';
-import type { FirmsDetection } from '../firms/types';
-import type { DedupeResult } from './types';
+import { canonicalSatelliteName } from "../firms/products";
+import type { FirmsDetection } from "../firms/types";
+import type { DedupeResult } from "./types";
 
 function numberKey(value: number): string {
-  return Object.is(value, -0) ? '0' : String(value);
+  return Object.is(value, -0) ? "0" : String(value);
 }
 
 export function detectionDedupeKey(detection: FirmsDetection): string {
@@ -14,7 +14,7 @@ export function detectionDedupeKey(detection: FirmsDetection): string {
     detection.acqAt,
     numberKey(detection.latitude),
     numberKey(detection.longitude),
-  ].join('|');
+  ].join("|");
 }
 
 export function dedupeDetections<T extends FirmsDetection>(
