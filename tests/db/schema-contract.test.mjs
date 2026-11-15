@@ -97,8 +97,32 @@ test("las vistas históricas son security_invoker y colapsan satélites", () => 
     /create view public\.historical_cell_day_occupancy\s+with \(security_invoker = true\)/i,
   );
   assert.match(sql, /bool_or\(source = 'VIIRS_SNPP_SP'\)/i);
+  assert.match(sql, /group by cell_id, acq_date, satellite/i);
+  assert.match(
+    sql,
+    /join sp_available s using \(cell_id, acq_date, satellite\)/i,
+  );
   assert.match(sql, /where not s\.has_sp or e\.source = 'VIIRS_SNPP_SP'/i);
   assert.match(sql, /group by cell_id, acq_date, sensor/i);
+});
+
+test("service_role escribe solo si existe y public no gana escritura", () => {
+  assert.match(
+    sql,
+    /if exists \(select 1 from pg_catalog\.pg_roles where rolname = 'service_role'\)/i,
+  );
+  assert.match(
+    sql,
+    /grant insert, update, delete on table[\s\S]*?to service_role/i,
+  );
+  assert.match(
+    sql,
+    /grant usage, select on sequence public\.raw_detections_id_seq[\s\S]*?to service_role/i,
+  );
+  assert.doesNotMatch(
+    sql,
+    /grant\s+(?:insert|update|delete)[^;]*\bto public\b/i,
+  );
 });
 
 test("el runner rechaza una ejecución sin DATABASE_URL antes de conectar", () => {
