@@ -17,7 +17,10 @@ export type MonthSelection = {
 export function monthLevel(year: number, month: number) {
   const row = demoYears.indexOf(year as (typeof demoYears)[number]);
   const safeRow = row < 0 ? 0 : row;
-  return (month * 7 + safeRow * 3 + (month < 5 ? safeRow + 2 : 0)) % 4;
+  const illustrativeSeason = [0, 0, 1, 1, 2, 2, 3, 3, 2, 1, 1, 0];
+  // A visual fixture only: this is not a measured seasonal pattern.
+  const variation = safeRow === 2 && month >= 4 && month <= 9 ? 1 : 0;
+  return Math.min(3, illustrativeSeason[month] + variation);
 }
 
 export function createMonthSelection(

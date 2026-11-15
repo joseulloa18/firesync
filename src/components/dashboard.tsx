@@ -268,7 +268,7 @@ export function HistoryDashboard({
   const [fromYear, setFromYear] = useState(2021);
   const [toYear, setToYear] = useState(2025);
   const [selected, setSelected] = useState<MonthSelection | null>(() =>
-    example ? createMonthSelection(2025, 2) : null,
+    createMonthSelection(example ? 2025 : demoYears[0], 2),
   );
   const [day, setDay] = useState(1);
   const [playing, setPlaying] = useState(false);

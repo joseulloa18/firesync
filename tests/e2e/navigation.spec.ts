@@ -17,7 +17,7 @@ test("default locale, example detail and language preservation", async ({
     page.getByRole("heading", { name: /Demonstration detail/ }),
   ).toBeVisible();
   const cell = page.getByRole("button", {
-    name: "Jan 2025: High illustrative level",
+    name: "Jan 2025: Low illustrative level",
   });
   await cell.focus();
   await page.keyboard.press("Enter");

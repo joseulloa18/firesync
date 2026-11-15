@@ -1204,3 +1204,25 @@ h1 {
     padding-top: 24px;
   }
 }
+.heat {
+  border-radius: 5px;
+}
+.heat[aria-pressed="true"] {
+  outline-color: #241a14;
+}
+.level-0 {
+  background: #fbd6d2;
+  color: #3c2416;
+}
+.level-1 {
+  background: #ffb48f;
+  color: #3c2416;
+}
+.level-2 {
+  background: #f77555;
+  color: #35170c;
+}
+.level-3 {
+  background: #be293b;
+  color: white;
+}

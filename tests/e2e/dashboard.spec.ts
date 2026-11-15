@@ -43,7 +43,7 @@ test("history selects a month, filters the map by day and downloads CSV", async 
 }) => {
   await page.goto("/es/mapa");
   await page
-    .getByRole("button", { name: "Ene 2025: Nivel ilustrativo alto" })
+    .getByRole("button", { name: "Ene 2025: Nivel ilustrativo bajo" })
     .click();
   await expect(
     page.getByRole("heading", { name: /Detalle de demostración/ }),
