@@ -143,7 +143,7 @@ Estructura principal:
 | `directoryName`   | Solo el nombre de la carpeta, nunca la ruta absoluta.            |
 | `manifestFile`    | Nombre del manifiesto usado.                                     |
 | `manifestVersion` | `1`.                                                             |
-| `synthetic`       | Valor declarado en el manifiesto.                                |
+| `synthetic`       | Verdadero si el manifiesto o cualquier CSV declara datos sintéticos. |
 | `bbox`            | Bbox aplicada o `null` si no se configuró.                        |
 | `limits`          | Límites efectivos usados en esta ejecución.                      |
 | `files`           | Un resultado por archivo, en el orden del manifiesto.            |

@@ -827,6 +827,9 @@ export async function previewLocalArchive(
   }
 
   const directoryName = path.basename(directoryReal) || ".";
+  // A manifest cannot erase explicit synthetic provenance in any input file.
+  const synthetic =
+    manifest.synthetic || results.some((file) => file.syntheticMarker);
 
   return {
     mode: "local_csv_preview",
@@ -834,12 +837,12 @@ export async function previewLocalArchive(
     directoryName,
     manifestFile: manifestFileName,
     manifestVersion: 1,
-    synthetic: manifest.synthetic,
+    synthetic,
     bbox: manifest.bbox,
     limits,
     files: results,
     totals,
-    notice: manifest.synthetic
+    notice: synthetic
       ? "Vista previa de datos sintéticos. No son datos reales de NASA FIRMS."
       : "Vista previa de archivos locales. No es una ingesta y no confirma incendios.",
     warnings,

@@ -488,8 +488,8 @@ describe("previewLocalArchive provenance", () => {
       }),
     );
     const report = await runPreview();
-    expect(report.synthetic).toBe(false);
-    expect(report.notice).not.toContain("sintéticos");
+    expect(report.synthetic).toBe(true);
+    expect(report.notice).toContain("datos sintéticos");
     expect(report.warnings.join(" ")).toContain("# SYNTHETIC");
   });
 
