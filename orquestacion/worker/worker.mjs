@@ -8,7 +8,7 @@
 //
 // Solo usa modulos integrados de Node. Nunca ejecuta comandos con shell
 // (salvo el envoltorio obligatorio de cmd.exe para shims .cmd/.bat en Windows),
-// nunca hace push/merge y nunca borra ni reinicia worktrees.
+// publica ramas verificadas sin fusionarlas y nunca borra ni reinicia worktrees.
 // Toda la seleccion de issues se valida localmente ademas de usar los filtros
 // de `gh`: estado abierto, asignado al usuario autenticado y con las etiquetas
 // station:ID y worker:ready.
@@ -356,7 +356,8 @@ function buildCommand(program, env) {
     return {
       resolved,
       command: comspec,
-      build: (args) => ["/d", "/s", "/c", `"${resolved}" ${args.map(quoteForCmd).join(" ")}`],
+      cmdShim: true,
+      build: (args) => ["/d", "/s", "/c", `"${quoteForCmd(resolved)} ${args.map(quoteForCmd).join(" ")}"`],
     };
   }
   return { resolved, command: resolved, build: (args) => args };
@@ -386,10 +387,11 @@ export function createExec(env = process.env) {
       encoding: "utf8",
       windowsHide: true,
       shell: false,
+      windowsVerbatimArguments: target.cmdShim === true,
       maxBuffer: 32 * 1024 * 1024,
     };
     if (options.inherit) spawnOptions.stdio = "inherit";
-    else spawnOptions.stdio = ["ignore", "pipe", "pipe"];
+    else spawnOptions.stdio = [options.input !== undefined ? "pipe" : "ignore", "pipe", "pipe"];
     if (Number.isFinite(options.timeout) && options.timeout > 0) {
       spawnOptions.timeout = options.timeout;
     }
@@ -747,12 +749,9 @@ function publishIssue({ exec, log, repo, worktree, issue, baseBranch }) {
   }
 
   const branch = worktree.branch;
-  const remote = exec(
-    "git",
-    ["show-ref", "--verify", "--quiet", `refs/remotes/origin/${branch}`],
-    { cwd: worktree.path, allowStatus: [0, 1] },
-  );
-  const base = remote.status === 0 ? `origin/${branch}` : `origin/${baseBranch()}`;
+  // Comparar con integracion permite reintentar si el push anterior llego a
+  // GitHub pero la creacion del PR fallo por una interrupcion de red.
+  const base = `origin/${baseBranch()}`;
   const ahead = Number(
     exec("git", ["rev-list", "--count", `${base}..HEAD`], { cwd: worktree.path }).stdout.trim(),
   ) || 0;
@@ -778,7 +777,7 @@ function publishIssue({ exec, log, repo, worktree, issue, baseBranch }) {
 
   const existing = ghJson(
     exec,
-    ["pr", "list", "--repo", repo, "--head", branch, "--state", "all", "--json", "number,url,isDraft,state"],
+    ["pr", "list", "--repo", repo, "--head", branch, "--state", "open", "--json", "number,url,isDraft,state"],
     "gh pr list",
   );
   const open = Array.isArray(existing) ? existing[0] : null;
@@ -833,6 +832,10 @@ function publishIssue({ exec, log, repo, worktree, issue, baseBranch }) {
   } else {
     log("PR ya existente: no se duplica PR ni comentario de publicacion.");
   }
+
+  exec("gh", ["issue", "edit", String(issue.number), "--repo", repo,
+    "--remove-label", "worker:ready", "--add-label", "worker:review"],
+    { cwd: worktree.path });
 
   return {
     published: true,
@@ -1297,6 +1300,18 @@ export async function runWorker(opts, deps = {}) {
       }
 
       const headBefore = exec("git", ["rev-parse", "HEAD"], { cwd: worktree.path }).stdout.trim();
+      try {
+        // Cada worktree instala sus dependencias: los enlaces compartidos
+        // impiden compilar con el root hermetico de Turbopack.
+        exec("pnpm", ["install", "--frozen-lockfile"], {
+          cwd: worktree.path, inherit: true, timeout: 15 * 60 * 1000,
+        });
+      } catch {
+        failures += 1;
+        log("ERROR  No se pudieron instalar dependencias; se conserva el worktree sin publicar.");
+        processed.push({ issue: number, ok: false, stage: "dependencies", worktree: worktree.path });
+        continue;
+      }
       const args = buildOpenCodeArgs({
         model: opts.model,
         worktree: worktree.path,
@@ -1363,7 +1378,7 @@ export async function runWorker(opts, deps = {}) {
 
       processed.push({
         issue: number,
-        ok: run.status === 0 && publish?.reason !== "pruebas fallidas",
+        ok: run.status === 0 && !dirtyAfter && publish?.published === true,
         stage: "run",
         worktree: worktree.path,
         branch: worktree.branch,

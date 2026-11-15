@@ -16,6 +16,7 @@ import {
   assertIssueNumber,
   assertPublishPush,
   buildOpenCodeArgs,
+  createExec,
   detectOpenCode,
   resolveOpenCodeBin,
   formatIssueContext,
@@ -837,7 +838,7 @@ test("un worktree sucio no bloquea a los demas issues", async (t) => {
 // Publicacion automatica
 // ---------------------------------------------------------------------------
 
-function publicationExec({ repoRoot, worktreePath, prs = [], testExit = 0 }) {
+function publicationExec({ worktreePath, prs = [], testExit = 0 }) {
   const normalized = worktreePath.replace(/\\/g, "/");
   return makeExec([
     (program, args, options) => {
@@ -903,7 +904,8 @@ function publicationExec({ repoRoot, worktreePath, prs = [], testExit = 0 }) {
       if (program === "gh" && args[0] === "pr" && args[1] === "create") {
         return { stdout: "https://github.com/joseulloa18/firesync/pull/99\n" };
       }
-      if (program === "pnpm") return { status: testExit };
+      if (program === "pnpm")
+        return { status: args[0] === "install" ? 0 : testExit };
       if (program === "opencode" && args[0] === "--version")
         return { stdout: "1.2.3\n" };
       if (program === "opencode" && args[0] === "run" && args[1] === "--help") {
@@ -1059,3 +1061,29 @@ test("lee el registro del equipo desde origin/main", async (t) => {
     "origin/main:orquestacion/equipo.json",
   );
 });
+
+test("ejecutor entrega el cuerpo UTF-8 a stdin para gh --body-file -", () => {
+  const body = "FIRESYNC: revisión\nsegunda línea";
+  const result = createExec()(
+    process.execPath,
+    [
+      "-e",
+      'process.stdin.setEncoding("utf8"); process.stdin.on("data", s => process.stdout.write(s));',
+    ],
+    { input: body },
+  );
+  assert.equal(result.stdout, body);
+});
+
+test(
+  "shim Windows admite rutas con espacios sin interpretar argumentos",
+  { skip: process.platform !== "win32" },
+  (t) => {
+    const dir = tempDir(t);
+    const shim = path.join(dir, "test con espacios.cmd");
+    writeFileSync(shim, "@echo off\r\necho %~1\r\n");
+    const result = createExec()(shim, ["FIRESYNC_OK"]);
+    assert.equal(result.stdout.trim(), "FIRESYNC_OK");
+    assert.throws(() => createExec()(shim, ["%PATH%"]), WorkerError);
+  },
+);
