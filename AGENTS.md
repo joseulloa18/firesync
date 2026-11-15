@@ -110,3 +110,14 @@ kb/                      base de conocimiento curada para el agente (primeros au
 - Histórico VIIRS solo S-NPP; NOAA-20/21 reservados para actualidad. Conservar satélite/producto antes de agregar.
 - Sin claves externas, la app arranca en modo demo explícito; datos sintéticos siempre identificados. Sin envíos de correo reales.
 - Cada agente trabaja solo en sus archivos asignados; deja resumen y commit, sin push ni cambios fuera del worktree. No iniciar otros agentes.
+
+## Preferencias operativas vigentes
+
+- El usuario pidió reducir el trabajo de implementación de la sesión central y delegarlo a sesiones reales de OpenCode.
+- No iniciar ni reanudar Codex CLI: el usuario está cambiando esa cuenta. Las sesiones previas de la consola terminaron.
+- Proveedores de ejecución: modelos gratuitos incluidos en OpenCode; NVIDIA Muse Glimmer (`nvidia/meta/muse-glimmer-30b`) cuando responda.
+- Baseten: preferir Muse Spark Open (`meta-models/muse-spark-open`); la prueba recibió 403 y requiere corregir autenticación.
+- OpenRouter: SOLO `openrouter/free` (referencia OpenCode `openrouter/openrouter/free`); no usar el router de pago `openrouter/auto`. La prueba recibió 401.
+- Repositorio público: `https://github.com/joseulloa18/firesync`. No crear repositorios con Josezx18.
+- No publicar los correos del equipo. Usar únicamente sus usuarios de GitHub para coordinación.
+- Supabase FIRESYNC Free creado: proyecto `dsefxgrsdqydrvgdjhoc`. No aplicar SQL sin revisión; las credenciales se gestionan fuera del repo.
