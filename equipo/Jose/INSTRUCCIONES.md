@@ -1,7 +1,8 @@
 # Estación de Jose
 
 Cuenta GitHub: **Josezx18**. Estación: `mac-jose`.
-Tarea inicial: [issue #16](https://github.com/joseulloa18/firesync/issues/16).
+Lee [TAREA-ACTUAL.md](TAREA-ACTUAL.md): OpenCode conserva la tarea #16;
+el Codex de la PC adicional tiene la tarea #38 en otra carpeta.
 
 Descarga y descomprime [FIRESYNC-Jose.zip](https://github.com/joseulloa18/firesync/releases/download/estaciones-v1/FIRESYNC-Jose.zip).
 Ejecuta INICIAR.bat (Windows) o INICIAR.command (Mac). Conserva todos los archivos de esta carpeta.
@@ -16,7 +17,8 @@ no presenta una tarea fallida como terminada. La coordinación revisa antes de i
 
 Puedes volver a ejecutar el lanzador para las siguientes tareas. No ejecutes dos
 lanzadores de la misma estación a la vez. No borres las carpetas de trabajo al cerrar.
-No se usa Codex de consola. OpenRouter se permite solo en su opción automática gratuita.
+El lanzador usa OpenCode. El usuario autorizó Codex en la PC adicional para #38;
+no iniciar Codex CLI en la estación central. OpenRouter solo permite `openrouter/free`.
 El equipo conserva datos y correos reales fuera del repositorio público.
 
 La invitación de escritura debe estar aceptada antes de publicar. Una estación
