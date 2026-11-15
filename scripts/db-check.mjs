@@ -72,7 +72,7 @@ async function main() {
         group by cell_id order by cell_id`,
     );
     assert.deepEqual(
-      nrt.rows.map(({ cell_id, n }) => [cell_id, n]),
+      nrt.rows.map(({ cell_id, n }) => [Number(cell_id), n]),
       [[CELL_B, 1]],
       "el SP de la celda A no debe eliminar el NRT de la celda B",
     );
@@ -98,6 +98,16 @@ async function main() {
       await client.query("rollback to savepoint anon_insert");
     }
     assert.equal(denied?.code, "42501", "anon no debe poder insertar");
+    await client.query("savepoint anon_ledger");
+    let ledgerDenied;
+    try {
+      await client.query("select count(*) from public.schema_migrations");
+    } catch (error) {
+      ledgerDenied = error;
+    } finally {
+      await client.query("rollback to savepoint anon_ledger");
+    }
+    assert.equal(ledgerDenied?.code, "42501", "anon no debe leer el ledger");
     await client.query("reset role");
 
     await client.query("set local role service_role");
