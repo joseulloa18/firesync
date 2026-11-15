@@ -1,0 +1,10 @@
+node_modules
+.next
+pnpm-lock.yaml
+docs
+orquestacion
+.agents
+AGENTS.md
+playwright-report
+test-results
+next-env.d.ts
