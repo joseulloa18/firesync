@@ -13,11 +13,11 @@ Estado: prototipo visual con datos sintéticos. Esta guía describe la capa visu
 | Naranja de controles e iconos | `#d94b00` |
 | Melocotón de navegación activa | `#ffe1cd` |
 | Borde tostado fino | `#e8d7c6` |
-| Sombra suave | `0 18px 48px rgba(98, 55, 28, 0.08)` |
+| Sombra suave | `0 2px 5px rgba(98, 55, 28, 0.08)` |
 
 - Titulares en Georgia serif, negrita, con interletraje negativo y tamaños grandes.
 - Cuerpo de texto en sans del sistema (`Inter`, `Segoe UI`, `Helvetica Neue`, `Arial`).
-- Las escalas del calendario usan melocotón a naranja y añaden símbolos (`·`, `−`, `+`, `◆`), de modo que el estado no depende solo del color.
+- Las escalas del calendario usan rosa a rojo, pasando por melocotón y naranja y añaden símbolos (`·`, `−`, `+`, `◆`), de modo que el estado no depende solo del color.
 - El foco visible usa azul `#1f6784` para contrastar con los controles naranjas.
 
 ## Estructura

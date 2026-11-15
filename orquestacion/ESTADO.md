@@ -8,7 +8,7 @@ Coordinador Windows: @joseulloa18, Codex desktop. No utilizar Codex CLI.
 | pc-1-dariana | Windows | @DarianaSM15 | OpenCode Desktop | 2 | Pendiente de primer arranque |
 | pc-2-ian | Windows | @NunezIan | OpenCode Desktop | 2 | Pendiente de primer arranque |
 | pc-3-yariel | Windows | @yarielDR32 | OpenCode Desktop | 2 | Pendiente de primer arranque |
-| mac-jose | macOS | @Josezx18 | OpenCode; Codex instalado sin uso | 2 | Invitación de escritura pendiente |
+| mac-jose | macOS | @Josezx18 | OpenCode; Codex instalado sin uso | 2 | Escritura verificada; tarea #16 asignada |
 
 Los cupos son valores iniciales ajustables, no capacidad medida. Las cuotas pueden
 compartirse por proveedor. El operador debe ejecutar localmente su lanzador y
@@ -22,7 +22,7 @@ El registro legible por el kit está en `equipo.json`.
 - Supabase FIRESYNC creado; migración `20261114000100_initial_core` aplicada.
 - Cliente FIRMS e informes disponibles; aún sin ingesta real ni validación científica.
 - Alertas y agente de IA pendientes.
-- Dos sesiones locales OpenCode preparan Windows/worker y Mac en worktrees separados.
+- Kit de estaciones publicado en Releases. Ian completó #14 y su PR #17 fue revisado e integrado.
 
 ## Proveedores
 

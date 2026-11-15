@@ -1,6 +1,6 @@
 # FIRESYNC
 
-Calendario de actividad de incendios. Repositorio privado del equipo:
+Calendario de actividad de incendios. Repositorio público del equipo:
 https://github.com/joseulloa18/firesync.
 
 ## Ejecutar la base de la aplicación

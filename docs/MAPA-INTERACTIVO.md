@@ -10,14 +10,15 @@ Datos sintéticos: `src/content/map-demo.ts`. Estilos propios: `src/components/f
   labels={labels}
   mode="history" // "history" | "recent" | "preview"
   sensor="all" // "all" | "MODIS" | "VIIRS"
-  day={14} // día UTC opcional de marzo de 2025
+  detections={records} // registros del mismo filtro usado por el panel
+  day={14} // día UTC opcional de los registros suministrados
   onSelect={(detection) => {}}
 />
 ```
 
 `FireMapLabels` exige exactamente: `loading`, `error`, `retry`, `unavailable`,
 `zoomIn`, `zoomOut`, `reset`, `draw`, `clear`, `attribution`, `legend`, `modis`,
-`viirs`, `demo`. El agente de interfaz traduce y pasa esos textos; el mapa no
+`viirs`, `demo`, `list`, `noData`, `north`, `attributionToggle`. El agente de interfaz traduce y pasa esos textos; el mapa no
 inventa palabras de interfaz.
 
 `DemoDetection` (desde `@/content/map-demo`) exporta `id`, `sensor`, `satellite`,
@@ -60,3 +61,21 @@ pnpm test
 pnpm typecheck
 pnpm lint
 ```
+
+## Integración verificada
+
+MapLibre 6 necesita `setWorkerUrl(new URL(..., import.meta.url).toString())`
+para que Next emita el worker como recurso local con ambos bundlers. Se aplica
+antes de crear el mapa; no se usa una URL de worker externa.
+Guía oficial: https://maplibre.org/maplibre-gl-js/docs/#esm
+
+Los registros suministrados no se truncan por modo. El calendario genera puntos
+sintéticos con el mismo conteo diario del resumen; actualidad pasa exactamente
+los registros del filtro a mapa, lista y ficha. Los cambios de mes, año, sensor
+y zona no presentan una detección ajena al filtro. El dibujo es local al
+prototipo: no crea zonas privadas ni activa alertas.
+
+Pruebas de esta integración: lint, typecheck, 109 unitarias/integración, build
+Webpack local y 12 E2E en Chromium de escritorio/móvil. Revisión manual: dos
+marcadores VIIRS coinciden con las dos filas filtradas, selección actualiza la
+ficha, zoom y cierre de un polígono funcionan; viewport móvil sin desbordamiento.
