@@ -1,0 +1,6 @@
+# SYNTHETIC TEST FIXTURE - NOT REAL NASA FIRMS DATA
+# Values and coordinates are fabricated for parser tests only.
+latitude,longitude,brightness,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_t31,frp,daynight,type
+18.4715,-69.9132,330.1,1.1,1.0,2024-03-01,530,Terra,"MODIS, synthetic ""instrument""",85,6.1NRT,290.2,12.5,D,0
+18.4715,-69.9132,311.4,1.0,1.0,2024-03-01,5,Aqua,MODIS synthetic,45,6.1NRT,285.0,4.0,N,0
+18.4801,-69.9001,309.7,1.0,1.1,2024-03-02,1230,Terra,MODIS synthetic,20,6.1NRT,284.5,2.1,D,0
