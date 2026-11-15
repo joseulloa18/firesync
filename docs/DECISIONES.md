@@ -62,3 +62,19 @@ Si una decisión bloquea el trabajo, el agente de codificación usa el **valor p
   Las detecciones del prototipo son sintéticas y están identificadas como tales.
 - No se copia el logotipo NASA ni se afirma respaldo institucional. La fotografía
   decorativa tiene crédito y licencia en `CREDITOS-VISUALES.md`.
+
+## Integración inicial de IA — 2026-11-15
+
+- El usuario autorizó explícitamente proceder con la IA ahora, como excepción al
+  orden previo de fases 0–6; su aceptación sigue pendiente y no se presume.
+- El usuario dispone de una API de Meta: se usa Meta Model API directa con
+  `muse-spark-1.3` configurable detrás de `LLMProvider`. Esto sustituye la primera
+  interpretación de usar Muse Glimmer mediante NVIDIA; no se reutilizan claves de
+  agentes de desarrollo ni se configura un fallback pagado implícito.
+- Adaptador propio con `fetch` y SSE, permitido por `AGENTE-IA.md` sección 2,
+  conserva el contrato independiente del proveedor sin añadir dependencias.
+- Entrega inicial de apoyo de solo lectura, con mock explícito y almacenamiento
+  temporal local; Muse en producción exige auditoría persistente y cuotas
+  atómicas. La migración se entrega para revisión y no se aplica automáticamente.
+- Variables, contratos, límites y reversión en `IA-MUSE.md`. No hay envíos,
+  efectos operativos ni contenido médico inventado.
