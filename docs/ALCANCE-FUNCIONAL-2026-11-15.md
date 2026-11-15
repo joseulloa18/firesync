@@ -115,3 +115,19 @@ Primero #21/#22 y datos verificables; luego actualidad/procedencia/ranking,
 autenticación/zonas/alertas, catálogo y orientación pública, laboratorio; después
 IA global y efectos con política. Cada PR requiere lint/typecheck/test, contratos
 actualizados, estados de carga/vacío/error y revisión E2E escritorio/móvil.
+
+## Seguimiento en GitHub
+
+| Entrega | Responsable | Issue | Estado al acordar alcance |
+|---|---|---|---|
+| Fuentes oficiales base | Dariana | #33 | Lista para ejecutar |
+| Actualidad, procedencia, boletín y ranking | Ian | #27 | En cola tras historial/mapa y datos |
+| Prevención y orientación pública | Dariana | #28 | En cola tras catálogo e historial |
+| Laboratorio por rondas | Yariel | #29 | En cola tras mapa/historial/caso |
+| Mis zonas y alertas | Ian | #30 | En cola tras ingesta/auth/RLS |
+| Chat global | Dariana | #31 | Bloqueado por fases 0–6 y backend IA |
+| Agente y efectos físicos | Yariel | #32 | Bloqueado por fases 0–6 y política |
+
+Las tareas en cola usan worker:waiting y no se ejecutan por tener un issue creado.
+Las implementaciones activas siguen siendo #21 y #22. La marca #23 quedó integrada
+con PR #25; su aceptación no implica que el resto de requisitos ya esté disponible.

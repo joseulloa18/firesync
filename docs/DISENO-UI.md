@@ -24,7 +24,7 @@ Estado: prototipo visual con datos sintéticos. Esta guía describe la capa visu
 
 ### Cabecera
 
-- Marca **FIRESYNC** con la leyenda **Calendario de fuego**.
+- Marca **FireSync** con el logo aportado por el usuario, sin subtítulo.
 - Siete destinos primarios: Inicio, Mapa e historial, Actualidad, Prevención, Laboratorio, Mis zonas y Respuesta.
 - Selector ES / EN conserva la ruta y los parámetros de búsqueda.
 - La navegación activa se muestra como píldora melocotón.
