@@ -1,5 +1,5 @@
 {
-  "brand": "Fire activity calendar",
+  "brand": "FIRESYNC",
   "tagline": "OBSERVE · UNDERSTAND · PREPARE",
   "nav": {
     "home": "Home",
@@ -47,7 +47,7 @@
   "more": "Higher fictional level",
   "select": "Select a month to explore the example.",
   "detail": "Demonstration detail",
-  "detailNote": "is_demo = true · Synthetic visual pattern, without a physical unit, sensor or satellite acquisition. This is not a harmonized index or a validated historical comparison.",
+  "detailNote": "Fictional demonstration data. Synthetic visual pattern, without a physical unit, sensor or satellite acquisition. This is not a harmonized index or a validated historical comparison.",
   "year": "Year",
   "step1": "01 / OBSERVE",
   "step1Title": "Time reveals patterns",

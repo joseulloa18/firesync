@@ -1,5 +1,5 @@
 {
-  "brand": "Calendario de fuego",
+  "brand": "FIRESYNC",
   "tagline": "OBSERVAR · COMPRENDER · PREPARAR",
   "nav": {
     "home": "Inicio",
@@ -47,7 +47,7 @@
   "more": "Mayor nivel ficticio",
   "select": "Selecciona un mes para explorar el ejemplo.",
   "detail": "Detalle de demostración",
-  "detailNote": "is_demo = true · Patrón visual sintético, sin unidad física, sensor ni adquisición satelital. No representa un índice armonizado ni una comparación histórica validada.",
+  "detailNote": "Datos ficticios de demostración. Patrón visual sintético, sin unidad física, sensor ni adquisición satelital. No representa un índice armonizado ni una comparación histórica validada.",
   "year": "Año",
   "step1": "01 / OBSERVAR",
   "step1Title": "El tiempo revela patrones",

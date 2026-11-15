@@ -1,4 +1,7 @@
-# Calendario de actividad de incendios (nombre provisional)
+# FIRESYNC
+
+Calendario de actividad de incendios. Repositorio privado del equipo:
+https://github.com/joseulloa18/firesync.
 
 ## Ejecutar la base de la aplicación
 
@@ -38,7 +41,12 @@ Playwright inicia el servidor de producción (requiere `pnpm build`) y comprueba
 navegación bilingüe, selección de mes por teclado, caso demo y health en Chromium
 de escritorio y móvil. Para servir manualmente la compilación: `pnpm start`.
 La CI en `.github/workflows/ci.yml` reproduce estas comprobaciones en Node 24.
-La ejecución remota de CI se verificará cuando exista un remoto y se suba la rama.
+La ejecución remota de CI queda a cargo del coordinador al integrar la rama.
+
+`pnpm test` incluye las pruebas Vitest de `tests/app/` y `tests/data/`.
+Para ejecutar solo las de aplicación: `pnpm test tests/app`.
+Las pruebas SQL `.test.mjs` se alojarán en `tests/db/` y correrán aparte con
+`pnpm test:db` mediante `node --test`; la CI las ejecutará cuando se integren.
 
 En Windows con restricciones de procesos, el cierre automático del servidor de
 Playwright puede quedarse esperando después de las pruebas. En ese caso, inicia
@@ -64,11 +72,13 @@ límites; no se recopilan correos ni se envían mensajes. Hay estados de carga,
 error recuperable, datos ausentes y desconexión. Todo texto de interfaz procede
 de `messages/es.json` y `messages/en.json`.
 
-La tarea T0.3 (Supabase/PostGIS y migraciones) está pendiente: `supabase/` está
-fuera del alcance autorizado de esta sesión. Los scripts `db:migrate`,
-`ingest:backfill` y `stats:recompute` terminan con error explícito de función
-pendiente para evitar simular éxito. Por ello BASE no acredita la Fase 0 completa
-ni habilita avanzar a fases operativas.
+La tarea T0.3 (Supabase/PostGIS y migraciones) se integrará desde la rama de SQL:
+`supabase/` está fuera del alcance autorizado de esta sesión. `pnpm db:migrate`
+ejecuta `node scripts/db-migrate.mjs`; ese archivo llegará desde la otra rama y
+el comando no estará disponible hasta integrarla. `ingest:backfill` y
+`stats:recompute` siguen terminando con error explícito de función pendiente.
+BASE por sí sola no acredita la Fase 0 completa ni habilita avanzar a fases
+operativas.
 
 Aplicación web para el reto **NASA Space Apps Challenge 2026: calendario armonizado de actividad de incendios**. Armoniza los registros de focos de incendio activos de los sensores MODIS y VIIRS (NASA FIRMS) en un calendario que permite ver patrones históricos, condiciones inusuales y períodos críticos dentro de un área de interés. Además añade monitoreo de zonas con alerta por correo, respuesta temprana con activos cercanos y un agente de IA de apoyo.
 
