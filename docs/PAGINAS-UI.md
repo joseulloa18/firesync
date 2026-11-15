@@ -120,3 +120,11 @@ Contenido mínimo: nombre de la zona, fecha y hora local y UTC de la detección,
 - `src/content/lab-case.json`: guion del laboratorio.
 - `messages/es.json` y `messages/en.json`: todos los textos.
 - `kb/`: base de conocimiento curada para el agente (ver `AGENTE-IA.md`).
+
+## Orientación pública en Respuesta — aclaración 2026-11-15
+
+La página puede ofrecer canales oficiales verificados y contexto público de una
+detección antes del panel operativo de coordinadores. Esto no concede acceso a
+activos/contactos privados ni adelanta el agente de fase 8. Ver
+[ALCANCE-FUNCIONAL-2026-11-15.md](ALCANCE-FUNCIONAL-2026-11-15.md) para recorrido,
+procedencia, noticias confirmadas, ranking, laboratorio y asistente global.
