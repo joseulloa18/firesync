@@ -150,7 +150,7 @@ revisar_identidad_git() {
     nota "git config --global user.name \"Tu Nombre\""
   fi
   if [ -n "$correo" ]; then
-    ok "git user.email: $correo"
+    ok "git user.email configurado (valor omitido)."
   else
     falta "git user.email no esta configurado."
     nota "git config --global user.email \"tu@correo\""
@@ -186,7 +186,7 @@ revisar_opencode() {
     return 0
   fi
   case "$version" in
-    2.*|*" 2."*)
+    2.*|*" 2."*|*" v2."*)
       if "$bin" --help >/dev/null 2>&1; then
         ok "OpenCode CLI 2 verificada: $bin ($version)"
       else
