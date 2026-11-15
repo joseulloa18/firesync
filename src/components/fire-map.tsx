@@ -47,6 +47,10 @@ export type FireMapProps = {
   detections?: readonly DemoDetection[];
   mode?: DemoMode;
   sensor?: DemoSensorFilter;
+  /** Controlled history filter; implemented by the map task in the next PR. */
+  onSensorChange?: (sensor: DemoSensorFilter) => void;
+  /** Enable the spatial activity layer when supplied by the history view. */
+  activity?: boolean;
   day?: number;
   onSelect?: (detection: DemoDetection) => void;
 };
