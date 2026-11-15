@@ -41,7 +41,14 @@ async function captureError(promise: Promise<unknown>) {
 describe("bounded FIRMS fetch (synthetic responses)", () => {
   it("rejects invalid byte budgets without calling fetch", () => {
     const fetchMock = vi.fn();
-    for (const limit of [0, -1, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+    for (const limit of [
+      0,
+      -1,
+      1.5,
+      NaN,
+      Infinity,
+      Number.MAX_SAFE_INTEGER + 1,
+    ]) {
       expect(() => createBoundedFirmsFetch(fetchMock, limit)).toThrow(
         FirmsClientError,
       );
@@ -86,8 +93,11 @@ describe("bounded FIRMS fetch (synthetic responses)", () => {
       "Content-Length": "1",
     });
     expect(
-      (await captureError(createBoundedFirmsFetch(async () => response, 5)(URL)))
-        .message,
+      (
+        await captureError(
+          createBoundedFirmsFetch(async () => response, 5)(URL),
+        )
+      ).message,
     ).toContain("byte limit");
   });
 
@@ -110,16 +120,18 @@ describe("bounded FIRMS fetch (synthetic responses)", () => {
       },
     });
     const response = await createBoundedFirmsFetch(
-      async () => new Response(body, { headers: { "Content-Type": "text/csv" } }),
+      async () =>
+        new Response(body, { headers: { "Content-Type": "text/csv" } }),
       bytes.length,
     )(URL);
     expect(await response.text()).toBe("á🔥");
     expect(response.headers.get("content-type")).toBe("text/csv");
     expect(response.headers.get("content-length")).toBe(String(bytes.length));
     await captureError(
-      createBoundedFirmsFetch(async () => new Response("á🔥"), bytes.length - 1)(
-        URL,
-      ),
+      createBoundedFirmsFetch(
+        async () => new Response("á🔥"),
+        bytes.length - 1,
+      )(URL),
     );
   });
 
@@ -166,10 +178,9 @@ describe("bounded FIRMS fetch (synthetic responses)", () => {
     const controller = new AbortController();
     const add = vi.spyOn(controller.signal, "addEventListener");
     const remove = vi.spyOn(controller.signal, "removeEventListener");
-    const result = await createBoundedFirmsFetch(async () => new Response("ok"))(
-      URL,
-      { signal: controller.signal },
-    );
+    const result = await createBoundedFirmsFetch(
+      async () => new Response("ok"),
+    )(URL, { signal: controller.signal });
     await result.text();
     expect(remove).toHaveBeenCalledWith("abort", add.mock.calls[0][1]);
   });
@@ -213,7 +224,9 @@ describe("bounded FIRMS fetch (synthetic responses)", () => {
     expect(
       (
         await captureError(
-          createBoundedFirmsFetch(fetchMock)(URL, { signal: controller.signal }),
+          createBoundedFirmsFetch(fetchMock)(URL, {
+            signal: controller.signal,
+          }),
         )
       ).code,
     ).toBe("aborted");

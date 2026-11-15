@@ -123,7 +123,7 @@ permanecen sin cambios. Las revisiones auxiliares tienen archivos separados.
 
 ## Verificación y estado de conexión
 
-Suites nuevas para ejecutar con el entorno completo:
+Comandos de verificación con las dependencias del lockfile:
 
 ```sh
 corepack pnpm test tests/data/firms-availability.test.ts tests/data/firms-bounded-fetch.test.ts tests/data/firms-probe.test.ts
@@ -132,20 +132,33 @@ corepack pnpm typecheck
 corepack pnpm test
 ```
 
-En esta sesión pasaron 18 comprobaciones nativas Node 24 del código real con
-HTTP sintético: composición cliente/parser, vacío válido, errores de contrato,
-límites, cancelación, timeout, redacción y CLI. Se usó temporalmente zod 4.1.8
-disponible en caché, **distinto de la versión fijada en el lockfile**. Esto es
-evidencia complementaria; no sustituye las suites Vitest, lint ni typecheck del
-entorno canónico. Las dependencias completas no se pudieron instalar por las
-restricciones de red/caché; esos checks siguen pendientes.
+Después de instalar las dependencias con el lockfile, `corepack pnpm test`
+pasó con **20 archivos y 265 pruebas**, incluyendo las tres suites nuevas.
+`corepack pnpm typecheck` y `corepack pnpm lint` (ESLint y Prettier) pasaron.
+Estas pruebas usan HTTP sintético y no consumen transacciones NASA.
 
-**No hay conexión real verificada todavía:** el usuario ya configuró la clave
-local, comprobada únicamente por presencia, pero el shell de esta sesión no
-tiene acceso DNS a NASA (`ENOTFOUND`) ni dependencias completas. No se ejecutó
-una consulta autenticada ni se conservaron observaciones NASA. Ejecutar el
-lanzador desde la Terminal local con acceso a Internet y registrar commit,
-producto, ventana, checksum y resultado saneado; nunca adjuntar clave o URL.
+### Evidencia de conexión real proporcionada por el operador
+
+El operador ejecutó `PROBAR-NASA.command` desde su Terminal local y compartió
+el JSON saneado del resultado. La comprobación autenticada terminó con
+`status: "ok"` tras consultar disponibilidad y área. La sesión del agente no
+ejecutó esa consulta remota; verificó el código y los checks locales.
+
+- Versión ejecutada: `5a75566` (base de código `6dcee6b` y ajustes del lanzador).
+- Descarga: `2026-11-15T17:30:14.346Z`.
+- Producto: `MODIS_SP`, procesamiento estándar, `isNrt: false`.
+- Disponibilidad devuelta: `2000-11-01` a `2026-08-31`.
+- Consulta: `2026-08-31`, un día, bbox `[-70.9,18.6,-70.5,19]`.
+- Registros leídos/aceptados/rechazados: `0 / 0 / 0`.
+- SHA-256: `b335277b53c6ffb4476f76ef457d775527f70fe5287310a46db6301d06266520`.
+- `persisted: false`, adquisición máxima `null`, última ingesta `null`,
+  `dataThrough: null`, cobertura `not_assessed` y validación científica
+  `not_performed`.
+
+Esto acredita la conexión para esa consulta, sin acreditar cobertura completa,
+ausencia de actividad ni una ingesta en la aplicación. Es una muestra de archivo
+estándar de agosto, no una consulta de actualidad de noviembre. No se guarda la
+clave, la URL autenticada ni el CSV observado en el repositorio.
 
 Para revertir, revertir el commit de esta etapa. Como no hay cambios en DB,
 configuración, jobs ni UI, no es necesario borrar datos ni desactivar servicios.

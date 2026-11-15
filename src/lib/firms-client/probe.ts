@@ -104,7 +104,9 @@ function assertCsvShape(csv: string): void {
   let closedQuote = false;
   let hasContent = false;
   let comment = false;
-  const fail = (): never => { throw new FirmsProbeError("invalid_csv"); };
+  const fail = (): never => {
+    throw new FirmsProbeError("invalid_csv");
+  };
   const endField = () => {
     if (headers === undefined) fields.push(field.trim().toLowerCase());
     columns += 1;
@@ -115,7 +117,11 @@ function assertCsvShape(csv: string): void {
     if (hasContent || columns > 0) {
       endField();
       if (headers === undefined) {
-        if (fields.some((name) => !name) || new Set(fields).size !== fields.length) fail();
+        if (
+          fields.some((name) => !name) ||
+          new Set(fields).size !== fields.length
+        )
+          fail();
         headers = fields;
       } else if (columns !== headers.length || ++rows > 10_000) fail();
     }
@@ -137,13 +143,20 @@ function assertCsvShape(csv: string): void {
     }
     if (quoted) {
       if (char === '"') {
-        if (text[i + 1] === '"') { field += '"'; i += 1; }
-        else { quoted = false; closedQuote = true; }
+        if (text[i + 1] === '"') {
+          field += '"';
+          i += 1;
+        } else {
+          quoted = false;
+          closedQuote = true;
+        }
       } else field += char;
       continue;
     }
-    if (char === ",") { endField(); hasContent = true; }
-    else if (char === "\r" || char === "\n") {
+    if (char === ",") {
+      endField();
+      hasContent = true;
+    } else if (char === "\r" || char === "\n") {
       if (char === "\r" && text[i + 1] === "\n") i += 1;
       endRow();
     } else if (closedQuote) {
@@ -216,14 +229,17 @@ export async function probeFirms(
   // This also bounds injected transports that ignore cancellation.
   let onAbort: (() => void) | undefined;
   const cancelled = new Promise<never>((_, reject) => {
-    onAbort = () => reject(new FirmsProbeError(
-      options.signal?.aborted ? "aborted" : "timeout",
-    ));
+    onAbort = () =>
+      reject(
+        new FirmsProbeError(options.signal?.aborted ? "aborted" : "timeout"),
+      );
     signal.addEventListener("abort", onAbort, { once: true });
   });
   const assertActive = () => {
     if (signal.aborted) {
-      throw new FirmsProbeError(options.signal?.aborted ? "aborted" : "timeout");
+      throw new FirmsProbeError(
+        options.signal?.aborted ? "aborted" : "timeout",
+      );
     }
   };
   const run = async (): Promise<FirmsProbeSummary> => {
@@ -231,9 +247,12 @@ export async function probeFirms(
     const url =
       "https://firms.modaps.eosdis.nasa.gov/api/data_availability/csv/" +
       encodeURIComponent(mapKey) +
-      "/" + request.source;
+      "/" +
+      request.source;
     const response = await fetch(url, {
-      method: "GET", headers: { Accept: "text/csv" }, signal,
+      method: "GET",
+      headers: { Accept: "text/csv" },
+      signal,
     });
     assertActive();
     if (response.status !== 200) {
@@ -241,18 +260,25 @@ export async function probeFirms(
       throw new FirmsProbeError("upstream_error");
     }
     const availability = parseFirmsAvailabilityCsv(
-      await response.text(), request.source,
+      await response.text(),
+      request.source,
     );
     const selectedDate = request.date ?? availability.maxDate;
     assertValidCalendarDate(selectedDate);
-    if (selectedDate < availability.minDate || selectedDate > availability.maxDate) {
+    if (
+      selectedDate < availability.minDate ||
+      selectedDate > availability.maxDate
+    ) {
       throw new FirmsProbeError("date_unavailable");
     }
 
     // Leave at least one second between availability and the area request.
     // Only one sample runs per invocation; distributed quotas are a later stage.
     await new Promise<void>((resolve) => {
-      const stop = () => { clearTimeout(timer); resolve(); };
+      const stop = () => {
+        clearTimeout(timer);
+        resolve();
+      };
       const timer = setTimeout(() => {
         signal.removeEventListener("abort", stop);
         resolve();
@@ -267,44 +293,63 @@ export async function probeFirms(
       timeoutMs,
     });
     const csv = await client.download(
-      { ...request, date: selectedDate, dayRange: 1 }, { signal },
+      { ...request, date: selectedDate, dayRange: 1 },
+      { signal },
     );
     assertActive();
     assertCsvShape(csv);
     let result: ReturnType<typeof parseFirmsCsv>;
     try {
       result = parseFirmsCsv(csv, {
-        source: request.source, bbox: { west, south, east, north },
+        source: request.source,
+        bbox: { west, south, east, north },
       });
     } catch {
       throw new FirmsProbeError("invalid_csv");
     }
     if (
-      result.rowsRejected !== 0 || result.rowsRead > 10_000 ||
-      result.detections.some((row) =>
-        row.acqDate !== selectedDate ||
-        [row.frp, row.brightness, row.brightness2, row.scan, row.track].some(
-          (value) => value !== null && value < 0,
-        ),
+      result.rowsRejected !== 0 ||
+      result.rowsRead > 10_000 ||
+      result.detections.some(
+        (row) =>
+          row.acqDate !== selectedDate ||
+          [row.frp, row.brightness, row.brightness2, row.scan, row.track].some(
+            (value) => value !== null && value < 0,
+          ),
       )
     ) {
       throw new FirmsProbeError("invalid_csv");
     }
     const newestAcquiredAt = result.detections.reduce<string | null>(
-      (latest, row) => latest === null || row.acqAt > latest ? row.acqAt : latest,
+      (latest, row) =>
+        latest === null || row.acqAt > latest ? row.acqAt : latest,
       null,
     );
     return firmsProbeSummarySchema.parse({
-      status: "ok", provider: "NASA FIRMS", origin: "observed",
-      sampleOnly: true, persisted: false,
-      source: request.source, isNrt: request.source.endsWith("_NRT"),
-      bbox: request.bbox, dayRange: 1, date: selectedDate,
-      availability: { minDate: availability.minDate, maxDate: availability.maxDate },
+      status: "ok",
+      provider: "NASA FIRMS",
+      origin: "observed",
+      sampleOnly: true,
+      persisted: false,
+      source: request.source,
+      isNrt: request.source.endsWith("_NRT"),
+      bbox: request.bbox,
+      dayRange: 1,
+      date: selectedDate,
+      availability: {
+        minDate: availability.minDate,
+        maxDate: availability.maxDate,
+      },
       downloadedAt: (options.now ?? (() => new Date()))().toISOString(),
-      newestAcquiredAt, lastIngestionAt: null, dataThrough: null,
-      coverage: "not_assessed", scientificValidation: "not_performed",
+      newestAcquiredAt,
+      lastIngestionAt: null,
+      dataThrough: null,
+      coverage: "not_assessed",
+      scientificValidation: "not_performed",
       sha256: createHash("sha256").update(csv).digest("hex"),
-      rowsRead: result.rowsRead, rowsAccepted: result.rowsAccepted, rowsRejected: 0,
+      rowsRead: result.rowsRead,
+      rowsAccepted: result.rowsAccepted,
+      rowsRejected: 0,
       note: "A satellite detection is not a confirmed fire.",
     });
   };
@@ -315,8 +360,13 @@ export async function probeFirms(
     if (error instanceof FirmsAvailabilityError) {
       throw new FirmsProbeError("invalid_availability");
     }
-    if (signal.aborted || (error instanceof FirmsClientError && error.code === "timeout")) {
-      throw new FirmsProbeError(options.signal?.aborted ? "aborted" : "timeout");
+    if (
+      signal.aborted ||
+      (error instanceof FirmsClientError && error.code === "timeout")
+    ) {
+      throw new FirmsProbeError(
+        options.signal?.aborted ? "aborted" : "timeout",
+      );
     }
     // Do not expose errors, causes, URLs or response text from upstream code.
     throw new FirmsProbeError("upstream_error");
