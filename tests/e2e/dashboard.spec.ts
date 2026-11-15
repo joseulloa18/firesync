@@ -64,7 +64,7 @@ test("history selects a month, filters the map by day and downloads CSV", async 
   expect(path).toBeTruthy();
   const text = await readFile(path as string, "utf8");
   expect(text).toContain("Datos sintéticos");
-  expect(text).toContain("synthetic-demo");
+  expect(text).toContain("sintético");
   await expectNoPageOverflow(page);
 });
 
@@ -89,24 +89,27 @@ test("latest activity filters detections by period and sensor", async ({
   await expectNoPageOverflow(page);
 });
 
-test("prevention keeps resources empty and downloads a synthetic summary", async ({
+test("prevention shows reviewed resources and downloads a synthetic sheet", async ({
   page,
 }) => {
   await page.goto("/es/prevencion");
   await expect(
-    page.getByText("Recursos oficiales pendientes", { exact: true }),
+    page.getByRole("heading", {
+      name: "Recursos oficiales verificados",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole("link", { name: "Llamar al 9-1-1" }),
   ).toHaveAttribute("href", "tel:911");
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Descargar resumen de zona" }).click();
+  await page.getByRole("button", { name: "Descargar ficha (.txt)" }).click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toContain("firesync-resumen");
-  expect(download.suggestedFilename()).toContain("demo.csv");
+  expect(download.suggestedFilename()).toContain("firesync-ficha");
+  expect(download.suggestedFilename()).toContain("demo.txt");
   const path = await download.path();
   expect(path).toBeTruthy();
   const text = await readFile(path as string, "utf8");
-  expect(text).toContain("synthetic-demo");
+  expect(text).toContain("sintético");
   await expectNoPageOverflow(page);
 });

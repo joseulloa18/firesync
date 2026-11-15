@@ -1,19 +1,21 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import {
-  HistoryDashboard,
-  PreventionDashboard,
-  RecentDashboard,
-} from "@/components/dashboard";
+import { HistoryDashboard, RecentDashboard } from "@/components/dashboard";
 import { Icon, type IconName } from "@/components/icon";
 import { dictionaries, sections } from "@/components/messages";
+import { PreventionResponseView } from "@/components/prevention-response";
+import { parseResponseContext } from "@/lib/resources/official-resources";
 
 export default async function SectionPage({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string; section: string }>;
-  searchParams: Promise<{ caso?: string; zona?: string }>;
+  searchParams: Promise<{
+    caso?: string;
+    zona?: string;
+    [key: string]: string | string[] | undefined;
+  }>;
 }) {
   const { locale, section } = await params;
   if (
@@ -25,7 +27,11 @@ export default async function SectionPage({
   const key = section as (typeof sections)[number];
   const title = t.nav[key];
   const intro = t.sectionIntros[key];
-  const { caso, zona } = await searchParams;
+  const search = await searchParams;
+  const { caso, zona } = search;
+  const initialZone = typeof zona === "string" ? zona : undefined;
+  const responseContext = parseResponseContext(search);
+  const today = new Date().toISOString();
   const emptyIcon: IconName =
     section === "laboratorio"
       ? "flask"
@@ -46,7 +52,7 @@ export default async function SectionPage({
             key={caso}
             locale={locale}
             example={caso === "demo"}
-            initialZone={zona}
+            initialZone={initialZone}
           />
           <section id="method" className="empty-card method-card">
             <span className="resource-icon" aria-hidden="true">
@@ -58,9 +64,14 @@ export default async function SectionPage({
           </section>
         </>
       ) : section === "actualidad" ? (
-        <RecentDashboard locale={locale} initialZone={zona} />
-      ) : section === "prevencion" ? (
-        <PreventionDashboard locale={locale} initialZone={zona} />
+        <RecentDashboard locale={locale} initialZone={initialZone} />
+      ) : section === "prevencion" || section === "respuesta" ? (
+        <PreventionResponseView
+          locale={locale}
+          mode={section}
+          context={responseContext}
+          today={today}
+        />
       ) : (
         <section className="empty-card">
           <span className="resource-icon" aria-hidden="true">

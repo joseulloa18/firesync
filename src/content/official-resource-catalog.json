@@ -49,8 +49,8 @@
       "regionCode": "DO",
       "publishedAt": null,
       "checkedAt": "2026-11-15T16:12:28Z",
-      "reviewStatus": "verified_source",
-      "notes": "Explica cómo funciona el 9-1-1 e incluye al Cuerpo de Bomberos entre las instituciones de respuesta. La página declara cobertura nacional parcial (aproximadamente 91.7 % de la población). Es el canal de emergencia verificado; no es un formulario específico de incendios forestales.",
+      "reviewStatus": "pending",
+      "notes": "Revisión central pendiente: esta URL devolvió HTTP 403. No presentar esta ficha como revisada hasta comprobar de nuevo su contenido. El aviso general de emergencia del proyecto se mantiene.",
       "is_demo": false
     },
     {
