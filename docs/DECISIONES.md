@@ -48,3 +48,17 @@ Si una decisión bloquea el trabajo, el agente de codificación usa el **valor p
 - Las sesiones trabajan en paralelo con ramas/carpetas independientes. La sesión central coordina y revisa.
 - GitHub: cuenta propietaria asociada a joseulloa@liceocientifico.org; usuario y colaboradores pendientes. No publicar en Josezx18, actualmente autenticada.
 - No hay cuentas Supabase/FIRMS configuradas para este producto. El modo demo debe funcionar sin credenciales y señalar su procedencia sintética.
+
+## Acuerdos visuales — 2026-11-15
+
+- El usuario aportó cuatro referencias y pidió adaptar ahora la interfaz de inicio,
+  historial, actualidad y prevención. Se implementa el prototipo visual de esas
+  pantallas mientras continúa la fase de datos; esto no declara cumplidas las
+  fases de ingesta, calibración científica, alertas ni recursos oficiales.
+- Se conservan FIRESYNC, los siete destinos existentes y los idiomas ES/EN.
+  Paleta crema/naranja, encabezados serif y tarjetas siguen las referencias.
+- Mapa base: MapLibre con estilo Liberty de OpenFreeMap, sin clave. Documentación:
+  https://openfreemap.org/quick_start/. Se mantiene su atribución cartográfica.
+  Las detecciones del prototipo son sintéticas y están identificadas como tales.
+- No se copia el logotipo NASA ni se afirma respaldo institucional. La fotografía
+  decorativa tiene crédito y licencia en `CREDITOS-VISUALES.md`.
