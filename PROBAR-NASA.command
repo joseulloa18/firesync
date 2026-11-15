@@ -3,7 +3,8 @@
 set -eu
 
 cd -- "${0:A:h}"
-export PATH="$HOME/.local/node/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+# Preferir Node 24 del sistema; ~/.local/node puede conservar una versión vieja.
+export PATH="/usr/local/bin:/opt/homebrew/opt/node@24/bin:/opt/homebrew/bin:$HOME/.local/node/bin:$PATH"
 
 pause_on_exit() {
   local task_exit=$?
@@ -31,6 +32,7 @@ node --input-type=module -e '
     process.exit(1);
   }
 '
+print "Usando Node $(node --version)."
 
 node --env-file-if-exists=.env.local --input-type=module -e '
   if (!process.env.FIRMS_MAP_KEY?.trim()) {
