@@ -71,7 +71,10 @@ recursos ni el diseño. Referencia:
    [`IA-PRODUCCION.env.example`](IA-PRODUCCION.env.example), con los valores reales
    en el entorno privado del servidor. Usar la clave de Meta ya verificada;
    generar `AGENT_RATE_LIMIT_SECRET` aleatorio de al menos 32 caracteres.
-   `SUPABASE_SERVICE_ROLE_KEY` nunca lleva prefijo `NEXT_PUBLIC_`.
+   `SUPABASE_SECRET_KEY` nunca lleva prefijo `NEXT_PUBLIC_`. Las claves nuevas
+   `sb_publishable_...` y `sb_secret_...` se envían por `apikey`, sin tratarlas
+   como JWT. El adaptador conserva las variables `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   y `SUPABASE_SERVICE_ROLE_KEY` como alternativas para claves anteriores.
 6. Conectar el mecanismo de retención revisado antes de habilitar el historial
    público persistente: mensajes anónimos 30 días, hashes de IP un día y auditoría
    un año. Su programación es una acción separada: esta preparación no crea cron
@@ -96,13 +99,22 @@ no degrada el almacenamiento de producción a memoria.
 ## Documentación primaria
 
 - [Supabase: migraciones](https://supabase.com/docs/guides/deployment/database-migrations).
+- [Supabase: claves de API](https://supabase.com/docs/guides/api/api-keys).
 - [Vercel: variables de entorno](https://vercel.com/docs/environment-variables/managing-environment-variables).
 - [Vercel: cron](https://vercel.com/docs/cron-jobs).
 
 Estado de activación: pendiente de conexiones verificadas. No hay evidencia de
 que las variables o tablas hayan sido configuradas en producción por esta etapa.
 
-Verificación local de la preparación: `pnpm lint`, `pnpm typecheck`, `pnpm build`,
-340 pruebas unitarias y los 48 casos de navegador pasan. Los nueve controles
-estáticos de base pasan y la prueba SQL se omite localmente; su ejecución real
-con PostgreSQL efímero pasó en el workflow de PostGIS del PR #51.
+Verificación local: `pnpm lint`, `pnpm typecheck`, `pnpm build` y 343 pruebas
+unitarias pasan, incluidas tres pruebas nuevas de compatibilidad de claves.
+La base de preparación también pasó los 48 casos de navegador. Los nueve
+controles estáticos de base pasan y la prueba SQL se omite localmente; su
+ejecución real con PostgreSQL efímero pasó en el workflow de PostGIS del PR #51.
+
+Comprobación posterior: se reutilizó la configuración pública guardada en
+`FIRESYNC-supabase` para un sondeo de cero filas desde el adaptador del agente;
+la lectura pública fue aceptada sin solicitar observaciones. No se accedió a
+filas privadas ni se escribieron datos. Un turno de prueba en el sitio público
+respondió HTTP 200 con `provider=mock`, `storage=memory` y datos demo: la
+activación de Muse y auditoría persistente en producción sigue pendiente.

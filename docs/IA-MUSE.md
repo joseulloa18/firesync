@@ -157,7 +157,8 @@ una herramienta inexistente se rechazan y auditan.
   devuelve `unavailable`. No inventa instituciones ni enlaces.
 
 Las lecturas reales requieren `NEXT_PUBLIC_SUPABASE_URL` y
-`NEXT_PUBLIC_SUPABASE_ANON_KEY`, usan RLS y una lista fija de tablas/columnas.
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (o `NEXT_PUBLIC_SUPABASE_ANON_KEY` para
+claves anteriores), usan RLS y una lista fija de tablas/columnas.
 Los servicios faltantes o respuestas no válidas no disparan fallback a datos
 demo. Rutas, clima, incidentes completos, activos y efectos no se ofrecen como
 herramientas disponibles en esta primera entrega.
@@ -176,7 +177,9 @@ al reiniciar. Esto no acredita persistencia de producción.
 
 Con `NODE_ENV=production`, un proveedor real exige `AGENT_STORAGE=supabase`,
 `AGENT_RATE_LIMIT_SECRET` aleatorio de al menos 32 caracteres,
-`NEXT_PUBLIC_SUPABASE_URL` HTTPS y `SUPABASE_SERVICE_ROLE_KEY` solo servidor.
+`NEXT_PUBLIC_SUPABASE_URL` HTTPS y `SUPABASE_SECRET_KEY` solo servidor
+(o `SUPABASE_SERVICE_ROLE_KEY` anterior). Las claves modernas se envían por
+`apikey`; las claves anteriores conservan la cabecera Bearer compatible.
 Sin eso falla antes de llamar al modelo. No hay fallback de almacenamiento a
 memoria si Supabase falla. Revisar y aplicar por el procedimiento del equipo la
 migración `20261115180000_agent_chat.sql` antes de activar ese modo.

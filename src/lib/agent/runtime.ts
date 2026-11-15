@@ -16,19 +16,19 @@ export function getAgentRuntime() {
     !audit ||
     storageSettings?.kind !== config.AGENT_STORAGE ||
     storageSettings?.url !== config.NEXT_PUBLIC_SUPABASE_URL ||
-    storageSettings?.key !== config.SUPABASE_SERVICE_ROLE_KEY
+    storageSettings?.key !== config.supabaseKey
   ) {
     audit =
       config.AGENT_STORAGE === "supabase"
         ? new SupabaseAuditStore(
             config.NEXT_PUBLIC_SUPABASE_URL!,
-            config.SUPABASE_SERVICE_ROLE_KEY!,
+            config.supabaseKey!,
           )
         : new MemoryAuditStore();
     storageSettings = {
       kind: config.AGENT_STORAGE,
       url: config.NEXT_PUBLIC_SUPABASE_URL,
-      key: config.SUPABASE_SERVICE_ROLE_KEY,
+      key: config.supabaseKey,
     };
   }
   return {
@@ -48,7 +48,7 @@ export function getAgentRuntime() {
       demo: config.demo,
       data: new PublicDataSource(
         config.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        config.publicKey,
       ),
     }),
   };
