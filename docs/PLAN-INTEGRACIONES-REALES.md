@@ -216,3 +216,30 @@ lectura de un día sin persistencia**, seguida de lectura de Supabase. Antes del
 escritor acordar manifiesto de cobertura, política SP/NRT y reserva de archivos;
 antes de API UI acordar estados y metadata con Ian. No esperar claves para
 revisar y publicar este plan.
+
+## Actualización de ejecución y publicación — 2026-11-15
+
+Después de la auditoría inicial, el usuario autorizó implementar la primera
+conexión NASA y publicar los cambios en GitHub mediante ramas y pull requests.
+La autorización más reciente sustituye, para estas entregas, la restricción
+anterior de publicación exclusiva por el operador. La integración en `main`
+sigue a cargo de coordinación.
+
+La entrega de implementación se mantiene separada de este plan, en
+`codex/nasa-firms-smoke`. El operador configuró su clave local y ejecutó
+consultas autenticadas de disponibilidad y área para `MODIS_SP` y
+`VIIRS_SNPP_NRT`; ambas terminaron con `status: ok`, cero registros en las
+muestras y sin persistencia. La evidencia saneada, las fechas de corte y los
+checks completos están documentados en `docs/FIRMS-CONEXION.md` de esa entrega.
+No se atribuye cobertura completa ni actualidad al día de consulta: el corte
+VIIRS devuelto fue 2026-11-02, para una descarga el 2026-11-15.
+
+La implementación pasó `pnpm lint`, `pnpm typecheck` y `pnpm test`
+(20 archivos, 265 pruebas) con las dependencias de su lockfile. Esto supera la
+limitación de dependencias descrita para el momento inicial de la auditoría;
+no acredita aún persistencia, integración de UI ni validación científica.
+
+La revisión previa a publicación comprobó que `main` incorporó la vista previa
+local de Ian y contenido de fuentes oficiales. Las nuevas entregas no
+reemplazan esos archivos. Cada PR conserva su alcance: este documento para
+planificación y los archivos nuevos de la conexión NASA para implementación.
