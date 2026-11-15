@@ -1,13 +1,14 @@
-# Tarea actual: fuentes oficiales de prevención, reporte y boletines
+# Tarea actual: espera de activación
 
-El logo y la marca (#23, PR #25) ya están integrados.
-Siguiente encargo: [#33](https://github.com/joseulloa18/firesync/issues/33).
-Vuelve a ejecutar INICIAR para recogerlo. No necesitas descargar otro ZIP.
+El catálogo de fuentes oficiales (#33, PR #42) ya está integrado en `main` y el
+issue está cerrado. El logo y la marca (#23, PR #25) también están integrados.
 
-Solo docs/FUENTES-OFICIALES.md y src/content/official-resource-catalog.json.
-Verifica fuentes primarias oficiales, URL, institución, cobertura y fecha.
-No inventes noticias, contactos ni protocolos y no edites componentes o mensajes.
-El catálogo se revisará antes de conectarlo a las páginas. Lee el issue completo.
+Tus siguientes tareas son
+[#28](https://github.com/joseulloa18/firesync/issues/28) y
+[#31](https://github.com/joseulloa18/firesync/issues/31). Ambas siguen en cola
+con dependencias: no las ejecutes hasta que coordinación cambie la etiqueta a
+`worker:ready` y confirme los archivos asignados.
 
-Tus siguientes tareas #28 y #31 están en cola con dependencias; todavía no
-se deben ejecutar. Una tarea por sesión/worktree y publicación por el worker.
+No necesitas descargar otro ZIP. Cuando se active la siguiente tarea, vuelve a
+ejecutar INICIAR para recogerla. Una tarea por sesión/worktree y publicación por
+el worker.
