@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Shell } from "@/components/shell";
+import { AgentLauncher } from "@/components/agent/launcher";
 import { dictionaries } from "@/components/messages";
 import { parseConfig } from "@/lib/config";
 import "../globals.css";
@@ -31,6 +32,7 @@ export default async function LocaleLayout({
       <body>
         <Suspense fallback={<p>{dictionaries[locale].loading}</p>}>
           <Shell locale={locale}>{children}</Shell>
+          <AgentLauncher locale={locale} />
         </Suspense>
       </body>
     </html>

@@ -164,6 +164,24 @@ En `DEMO_MODE`, `recipient` de los avisos a activos es siempre `DEMO_INBOX`.
 
 La ubicación en `context.location` solo se usa durante la sesión y no se guarda.
 
+### Primera integración de chat (Muse)
+
+`POST /api/agent/chat` implementa el perfil público `support-chat`; añade
+`locale?: "es" | "en"` (por defecto `es`) al cuerpo anterior. La sesión pertenece
+a una cookie HttpOnly; `sessionId` por sí solo no permite recuperar el historial.
+SSE: `session`, `text_delta`, `tool`, `fallback`, `done` y `error`, cada uno con JSON
+validado y campo `type`. Máximo 4000 caracteres por mensaje, diez turnos/minuto y
+sesenta/hora por IP, un turno concurrente por sesión y 60 segundos de ejecución.
+Errores HTTP: `400` entrada inválida, `403` origen/sesión, `409` sesión ocupada,
+`413` cuerpo mayor de 24000 bytes, `415` contenido distinto de JSON, `429` cuota
+y `503` configuración/almacenamiento no disponible. Los fallos durante streaming
+usan un evento `error` terminal y no exponen errores crudos del proveedor.
+
+El adaptador real es Meta Model API (`LLM_PROVIDER=meta`), con mock por defecto.
+Los endpoints de revisión y disparo de incidentes de la tabla siguen pendientes.
+Contrato completo, herramientas implementadas, variables y límites:
+[`IA-MUSE.md`](IA-MUSE.md).
+
 ## 9. Tareas programadas
 
 Todas `POST`, con `Authorization: Bearer ${CRON_SECRET}`, idempotentes.
