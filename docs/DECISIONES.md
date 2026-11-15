@@ -37,3 +37,14 @@ Si una decisión bloquea el trabajo, el agente de codificación usa el **valor p
 | Fecha | Documentos | Contradicción | Resolución |
 |---|---|---|---|
 | | | | |
+
+## Arranque de desarrollo — 2026-11-14
+
+- Se adopta el conjunto A como base documental; Next.js, TypeScript, Supabase/PostGIS y pnpm.
+- Primer hito acotado a base local y componentes de datos/esquema independientes. Las integraciones externas y el backfill histórico no se consideran completados por mostrar una demo.
+- El diagrama Miro dice quitar quemas no forestales; prevalece DATOS-Y-ARMONIZACION.md: se conservan quemas agrícolas y se explica que una anomalía térmica no identifica el tipo de incendio.
+- Histórico VIIRS: solo S-NPP. La agregación debe filtrar producto/satélite antes de reducir a familia.
+- La agrupación mínima en incidentes se adelanta para soportar alertas, aunque el panel operativo y agente sigan en P2.
+- Las sesiones trabajan en paralelo con ramas/carpetas independientes. La sesión central coordina y revisa.
+- GitHub: cuenta propietaria asociada a joseulloa@liceocientifico.org; usuario y colaboradores pendientes. No publicar en Josezx18, actualmente autenticada.
+- No hay cuentas Supabase/FIRMS configuradas para este producto. El modo demo debe funcionar sin credenciales y señalar su procedencia sintética.
