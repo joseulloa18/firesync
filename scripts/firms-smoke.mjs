@@ -52,7 +52,10 @@ if (args.length === 1 && args[0] === "--help") {
   } catch (error) {
     const code = error instanceof Error &&
       ["missing_key", "invalid_input"].includes(error.message)
-      ? error.message : "execution_error";
+      ? error.message
+      : error?.code === "ERR_MODULE_NOT_FOUND"
+        ? "missing_dependencies"
+        : "execution_error";
     console.error(JSON.stringify({ status: "failed", code, persisted: false }));
     process.exitCode = 1;
   }

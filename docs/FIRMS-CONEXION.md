@@ -23,6 +23,13 @@ Los contratos oficiales consultados el 2026-11-15 son:
 
 ## Ejecutar
 
+En macOS puedes abrir `PROBAR-NASA.command` con doble clic desde Finder.
+El lanzador comprueba la presencia de la clave sin mostrarla, instala las
+dependencias con el lockfile y ejecuta un único smoke desde la Terminal local.
+Conserva la ventana abierta para revisar el resultado. No hace push, SQL ni
+envíos de correo. Si macOS requiere confirmación para ejecutar el archivo,
+puedes usar los comandos de Terminal de esta sección.
+
 Requiere Node 24 LTS y las dependencias del proyecto instaladas con el lockfile:
 
 ```sh
@@ -87,7 +94,8 @@ No se sustituyen errores por datos demo ni por un cero inventado.
 
 Los errores de la CLI son JSON saneado con `status: "failed"`, un `code` y
 `persisted: false`; terminan con exit code 1. `missing_key` significa que no hay
-clave en ese proceso; `date_unavailable` evita la descarga de una fecha fuera
+clave en ese proceso; `missing_dependencies` indica que hay que instalar las
+dependencias; `date_unavailable` evita la descarga de una fecha fuera
 del rango del producto. Nunca se imprime el texto del error remoto.
 
 ## Archivos y coordinación
@@ -98,6 +106,7 @@ Esta etapa añade únicamente:
 - `src/lib/firms-client/bounded-fetch.ts`: transporte con límite de bytes.
 - `src/lib/firms-client/probe.ts`: composición del smoke y salida validada.
 - `scripts/firms-smoke.mjs`: CLI Node 24 sin añadir dependencias ni runners.
+- `PROBAR-NASA.command`: lanzador local macOS para instalar y ejecutar la muestra.
 - `tests/data/firms-availability.test.ts`, `firms-bounded-fetch.test.ts` y
   `firms-probe.test.ts`: pruebas con respuestas y credenciales sintéticas.
 - Este documento.
@@ -131,10 +140,11 @@ evidencia complementaria; no sustituye las suites Vitest, lint ni typecheck del
 entorno canónico. Las dependencias completas no se pudieron instalar por las
 restricciones de red/caché; esos checks siguen pendientes.
 
-**No hay conexión real verificada todavía:** no existe una FIRMS_MAP_KEY
-configurada en este entorno y el shell no tiene acceso DNS a los servicios
-externos. No se ejecutó una consulta autenticada ni se conservaron observaciones
-NASA. Al disponer del entorno, ejecutar un único smoke y registrar commit,
+**No hay conexión real verificada todavía:** el usuario ya configuró la clave
+local, comprobada únicamente por presencia, pero el shell de esta sesión no
+tiene acceso DNS a NASA (`ENOTFOUND`) ni dependencias completas. No se ejecutó
+una consulta autenticada ni se conservaron observaciones NASA. Ejecutar el
+lanzador desde la Terminal local con acceso a Internet y registrar commit,
 producto, ventana, checksum y resultado saneado; nunca adjuntar clave o URL.
 
 Para revertir, revertir el commit de esta etapa. Como no hay cambios en DB,
