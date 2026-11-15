@@ -43,6 +43,7 @@ jobs:
           const client = new Client({ connectionString: process.env.DATABASE_URL });
           await client.connect();
           await client.query("create role anon nologin");
+          await client.query("create role authenticated nologin");
           await client.query("create role service_role nologin bypassrls");
           await client.end();
           '
