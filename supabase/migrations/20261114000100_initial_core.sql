@@ -56,6 +56,9 @@ create table public.raw_detections (
   confidence      public.confidence_class not null,
   frp             numeric check (frp is null or frp >= 0),
   brightness      numeric check (brightness is null or brightness >= 0),
+  brightness2     numeric check (brightness2 is null or brightness2 >= 0),
+  scan            numeric,
+  track           numeric,
   daynight        char(1) check (daynight is null or daynight in ('D', 'N')),
   is_nrt          boolean not null default false,
   cell_id         bigint not null references public.grid_cells (cell_id),
@@ -66,6 +69,15 @@ create table public.raw_detections (
   constraint raw_detections_source_sensor_check check (
     (source like 'MODIS%' and sensor = 'MODIS')
     or (source like 'VIIRS%' and sensor = 'VIIRS')
+  ),
+  constraint raw_detections_source_satellite_check check (
+    (source in ('MODIS_SP', 'MODIS_NRT') and satellite in ('Terra', 'Aqua'))
+    or (source in ('VIIRS_SNPP_SP', 'VIIRS_SNPP_NRT') and satellite = 'S-NPP')
+    or (source in ('VIIRS_NOAA20_SP', 'VIIRS_NOAA20_NRT') and satellite = 'NOAA-20')
+    or (source in ('VIIRS_NOAA21_SP', 'VIIRS_NOAA21_NRT') and satellite = 'NOAA-21')
+  ),
+  constraint raw_detections_acq_date_utc_check check (
+    acq_date = (acq_at at time zone 'UTC')::date
   ),
   constraint raw_detections_nrt_check check (is_nrt = (right(source, 4) = '_NRT')),
   constraint raw_detections_geom_check check (
@@ -120,10 +132,10 @@ create table public.calibration_factors (
   sensor_from       public.sensor_family not null default 'VIIRS',
   sensor_to         public.sensor_family not null default 'MODIS',
   month_of_year     smallint check (month_of_year between 1 and 12),
-  factor            numeric not null check (factor > 0),
+  factor            numeric not null check (factor >= 0),
   method            text not null check (method in ('ratio_of_totals', 'regression_origin')),
   n_overlap_months  integer not null check (n_overlap_months > 0),
-  r2                numeric check (r2 is null or (r2 >= 0 and r2 <= 1)),
+  r2                numeric check (r2 is null or r2 <= 1),
   period_start      date not null,
   period_end        date not null,
   method_version    text not null check (btrim(method_version) <> ''),
@@ -186,3 +198,43 @@ grant select on public.cell_day_occupancy to public;
 grant select on public.cell_month to public;
 grant select on public.calibration_factors to public;
 grant select on public.region_month_stats to public;
+
+-- Vistas de la CDO histórica. security_invoker respeta la RLS y los privilegios
+-- del llamador. Primero se prefiere SP sobre NRT por satélite y día; después se
+-- colapsa a una fila por celda/día/sensor. Terra + Aqua en la misma celda/día
+-- cuentan una sola CDO, no dos.
+create view public.historical_product_detections
+with (security_invoker = true) as
+with eligible as (
+  select id, cell_id, source, sensor, satellite, acq_at, acq_date, confidence, frp, geom
+  from public.raw_detections
+  where source in ('MODIS_SP', 'VIIRS_SNPP_SP', 'VIIRS_SNPP_NRT')
+    and confidence <> 'low'
+),
+sp_available as (
+  select acq_date, satellite, bool_or(source = 'VIIRS_SNPP_SP') as has_sp
+  from eligible
+  group by acq_date, satellite
+)
+select e.id, e.cell_id, e.source, e.sensor, e.satellite, e.acq_at, e.acq_date,
+       e.confidence, e.frp, e.geom
+from eligible e
+join sp_available s using (acq_date, satellite)
+where not s.has_sp or e.source = 'VIIRS_SNPP_SP';
+
+create view public.historical_cell_day_occupancy
+with (security_invoker = true) as
+select cell_id,
+       acq_date as day,
+       sensor,
+       count(*)::integer as n_detections,
+       max(frp) as max_frp,
+       array_agg(distinct satellite order by satellite) as satellites
+from public.historical_product_detections
+group by cell_id, acq_date, sensor;
+
+grant select on public.historical_product_detections to public;
+grant select on public.historical_cell_day_occupancy to public;
+
+comment on view public.historical_cell_day_occupancy is
+  'CDO histórica: una fila por celda/día/sensor. Terra y Aqua se colapsan; no sumar occupied_days por satélite.';

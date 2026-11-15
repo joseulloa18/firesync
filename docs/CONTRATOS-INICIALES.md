@@ -13,7 +13,7 @@ armonización:
 |---|---|
 | `regions` | País, provincias y polígonos personalizados; geometría `MultiPolygon(4326)` y área en km². |
 | `grid_cells` | Cuadrícula de 0.01°; `cell_id = iy * 36000 + ix`, centroide y región opcional. |
-| `raw_detections` | Detecciones FIRMS con `source`, `satellite`, fecha UTC, confianza normalizada, FRP y geometría. |
+| `raw_detections` | Detecciones FIRMS con `source`, `satellite`, fecha UTC, confianza normalizada, FRP, `scan`, `track`, `brightness2` y geometría. |
 | `cell_day_occupancy` | CDO por celda, día, **source y satellite**. |
 | `cell_month` | Agregado mensual por celda, **source y satellite**. |
 | `calibration_factors` | Factores VIIRS→MODIS por región, método y versión. |
@@ -39,7 +39,34 @@ source in ('MODIS_SP', 'VIIRS_SNPP_SP', 'VIIRS_SNPP_NRT')
 `MODIS_NRT` y todos los orígenes NOAA. NOAA-20/21 puede almacenarse para
 Actualidad y alertas, pero no entra en el índice histórico.
 
+La migración también valida la pareja canónica `source`/`satellite`: MODIS con
+`Terra` o `Aqua`, `VIIRS_SNPP_*` con `S-NPP`, `VIIRS_NOAA20_*` con `NOAA-20` y
+`VIIRS_NOAA21_*` con `NOAA-21`. Además exige que `acq_date` sea la fecha UTC
+derivada de `acq_at`.
+
+### Vistas de CDO histórica
+
+Los agregados separados por satélite **no se pueden sumar**. Pertenecen a
+productos distintos y Terra y Aqua pueden solaparse en la misma celda y día.
+
+La migración entrega dos vistas `security_invoker`:
+
+- `historical_product_detections`: selecciona solo `MODIS_SP`, `VIIRS_SNPP_SP`
+  y `VIIRS_SNPP_NRT`, descarta confianza `low` y, si para un satélite y día hay
+  SP y NRT, conserva únicamente las filas SP.
+- `historical_cell_day_occupancy`: colapsa el resultado a una fila por
+  `cell_id`, `day` y `sensor`. Terra y Aqua en la misma celda/día cuentan una
+  sola CDO; `n_detections` es informativo y `satellites` deja trazabilidad.
+
+El agregado mensual histórico se deriva de esa unión diaria contando días
+ocupados por celda y sensor. **No** se obtiene sumando `occupied_days` de
+`cell_month` entre satélites. La persistencia del pipeline queda fuera de esta
+entrega; estas vistas son el contrato de lectura para el cálculo posterior.
+
 ### Calibración con mes nullable
+
+`factor` admite cualquier valor mayor o igual que cero. `r2` solo se acota por
+arriba (`<= 1`) porque el cálculo TS usa `1 - SSE/SST` y puede ser negativo.
 
 `month_of_year` es nullable y **no** forma parte de la clave primaria. La
 unicidad se resuelve con dos índices parciales:
@@ -55,7 +82,9 @@ Así pueden coexistir el factor anual y los factores por mes del año sin usar
 
 Las siete tablas tienen RLS activado y una política de `select` pública. No hay
 políticas de escritura para `anon` ni `authenticated`: la ingesta y el cálculo
-de agregados deben usar `service_role` desde el servidor, que evita RLS.
+de agregados deben usar `service_role` desde el servidor, que evita RLS. Las
+vistas históricas son `security_invoker`, por lo que respetan la RLS y los
+privilegios de quien consulta.
 
 Se concede `select` a `public` sobre las siete tablas. Los roles de Supabase
 (`anon`, `authenticated`, `service_role`) deben existir en el proyecto de
@@ -97,8 +126,9 @@ baja (solo hash), `incidents`, `incident_events`, `incident_detections`,
 `assets`, `notifications`, tablas del agente, prevención, lugares seguros,
 `job_runs`, vistas materializadas de estadísticas ni cargas de datos reales.
 
-También queda pendiente decidir si los agregados separan además por
-`instrument` o si `satellite` es suficiente para la reconciliación NRT/SP.
+También queda pendiente materializar la CDO mensual histórica y definir la
+reconciliación SP/NRT a nivel de ingesta; las vistas actuales solo leen datos
+existentes y no persisten el pipeline.
 
 ## Verificación de esta entrega
 
