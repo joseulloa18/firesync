@@ -36,6 +36,10 @@ export type FireMapLabels = {
   modis: string;
   viirs: string;
   demo: string;
+  list: string;
+  noData: string;
+  north: string;
+  attributionToggle: string;
 };
 
 export type FireMapProps = {
@@ -139,7 +143,12 @@ export function FireMap({
       let maplibre: MapModule;
       try {
         maplibre = await import("maplibre-gl");
-        maplibre.setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).toString());
+        maplibre.setWorkerUrl(
+          new URL(
+            "maplibre-gl/dist/maplibre-gl-worker.mjs",
+            import.meta.url,
+          ).toString(),
+        );
       } catch {
         if (!cancelled) setStatus("error");
         return;
@@ -152,6 +161,13 @@ export function FireMap({
           style: STYLE_URL,
           center: DEMO_CENTER,
           zoom: DEMO_ZOOM,
+          locale: {
+            "NavigationControl.ZoomIn": labelsRef.current.zoomIn,
+            "NavigationControl.ZoomOut": labelsRef.current.zoomOut,
+            "NavigationControl.ResetBearing": labelsRef.current.north,
+            "AttributionControl.ToggleAttribution":
+              labelsRef.current.attributionToggle,
+          },
           attributionControl: {
             compact: true,
             customAttribution: labelsRef.current.attribution,
@@ -436,10 +452,15 @@ export function FireMap({
         <span className="fmap-badge">{labels.demo}</span>
       </div>
 
-      <section className="fmap-list" aria-labelledby="fmap-list-title">
-        <h2 id="fmap-list-title">{labels.legend}</h2>
+      <details
+        className="fmap-list"
+        open={status === "unavailable" || status === "error"}
+      >
+        <summary>
+          {labels.list} · {detections.length}
+        </summary>
         {detections.length === 0 ? (
-          <p>{labels.unavailable}</p>
+          <p>{labels.noData}</p>
         ) : (
           <ul>
             {detections.map((detection) => (
@@ -473,7 +494,7 @@ export function FireMap({
             ))}
           </ul>
         )}
-      </section>
+      </details>
     </div>
   );
 }

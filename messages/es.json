@@ -93,7 +93,7 @@
   "period72": "Últimos 3 días",
   "period7": "Últimos 7 días",
   "zoneOptions": [
-    "Sector norte (ficticio)",
+    "Área de demostración (ficticia)",
     "Sector sur (ficticio)",
     "Valle central (ficticio)"
   ],
@@ -169,6 +169,10 @@
     "legend": "Leyenda",
     "modis": "MODIS",
     "viirs": "VIIRS",
-    "demo": "Demostración"
+    "demo": "Demostración",
+    "list": "Ver detecciones de ejemplo",
+    "noData": "No hay detecciones para este filtro.",
+    "north": "Restablecer orientación al norte",
+    "attributionToggle": "Mostrar atribución del mapa"
   }
 }

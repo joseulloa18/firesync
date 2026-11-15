@@ -93,7 +93,7 @@
   "period72": "Last 3 days",
   "period7": "Last 7 days",
   "zoneOptions": [
-    "North sector (fictional)",
+    "Demonstration area (fictional)",
     "South sector (fictional)",
     "Central valley (fictional)"
   ],
@@ -169,6 +169,10 @@
     "legend": "Legend",
     "modis": "MODIS",
     "viirs": "VIIRS",
-    "demo": "Demonstration"
+    "demo": "Demonstration",
+    "list": "View sample detections",
+    "noData": "No detections match this filter.",
+    "north": "Reset bearing to north",
+    "attributionToggle": "Show map attribution"
   }
 }

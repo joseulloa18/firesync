@@ -76,10 +76,13 @@ test("latest activity filters detections by period and sensor", async ({
     page.getByText("Una detección satelital no es un incendio confirmado."),
   ).toBeVisible();
   await expect(page.locator(".detection-list button")).toHaveCount(5);
+  await expect(page.locator(".fmap-list li")).toHaveCount(5);
   await page.getByLabel("Período").selectOption("168");
   await expect(page.locator(".detection-list button")).toHaveCount(6);
+  await expect(page.locator(".fmap-list li")).toHaveCount(6);
   await page.getByLabel("Sensor").selectOption("MODIS");
   await expect(page.locator(".detection-list button")).toHaveCount(3);
+  await expect(page.locator(".fmap-list li")).toHaveCount(3);
   await expect(page.locator(".detection-list button").first()).toContainText(
     "MODIS",
   );

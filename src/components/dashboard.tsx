@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FireMap } from "./fire-map";
 import type { DemoDetection } from "@/content/map-demo";
+import { createSyntheticMonthDetections } from "@/content/map-demo";
 import {
   Calendar,
   createMonthSelection,
@@ -116,6 +117,7 @@ function MapCard({
   mode,
   sensor,
   day,
+  records,
   onSelect,
 }: {
   t: Dict;
@@ -124,6 +126,7 @@ function MapCard({
   mode: "history" | "recent" | "preview";
   sensor?: SensorFilter;
   day?: number;
+  records?: readonly DemoDetection[];
   onSelect?: (detection: DemoDetection) => void;
 }) {
   return (
@@ -144,6 +147,7 @@ function MapCard({
           mode={mode}
           sensor={sensor}
           day={day}
+          detections={records}
           onSelect={onSelect}
         />
       </div>
@@ -154,6 +158,17 @@ function MapCard({
 export function HomeDashboard({ locale }: { locale: Locale }) {
   const t = dictionaries[locale];
   const [selected, setSelected] = useState<MonthSelection | null>(null);
+  const records = useMemo(
+    () =>
+      selected
+        ? createSyntheticMonthDetections(
+            selected.year,
+            selected.month,
+            selected.daily,
+          )
+        : undefined,
+    [selected],
+  );
   return (
     <section className="dashboard-grid" aria-label={t.filters}>
       <MapCard
@@ -161,6 +176,7 @@ export function HomeDashboard({ locale }: { locale: Locale }) {
         title={t.homeMapTitle}
         subtitle={t.homeMapSubtitle}
         mode="preview"
+        records={records}
       />
       <Calendar
         locale={locale}
@@ -257,10 +273,22 @@ export function HistoryDashboard({
   const [day, setDay] = useState(1);
   const [playing, setPlaying] = useState(false);
   const years = useMemo(() => rangeYears(fromYear, toYear), [fromYear, toYear]);
+  const records = useMemo(
+    () =>
+      selected
+        ? createSyntheticMonthDetections(
+            selected.year,
+            selected.month,
+            selected.daily,
+            zone,
+          )
+        : [],
+    [selected, zone],
+  );
 
   function selectMonth(selection: MonthSelection) {
     setSelected(selection);
-    setDay(1);
+    setDay(Math.max(1, selection.daily.findIndex((count) => count > 0) + 1));
     setPlaying(false);
   }
 
@@ -275,11 +303,19 @@ export function HistoryDashboard({
   function changeFrom(value: number) {
     setFromYear(value);
     if (value > toYear) setToYear(value);
+    if (selected && selected.year < value) {
+      setSelected(null);
+      setPlaying(false);
+    }
   }
 
   function changeTo(value: number) {
     setToYear(value);
     if (value < fromYear) setFromYear(value);
+    if (selected && selected.year > value) {
+      setSelected(null);
+      setPlaying(false);
+    }
   }
 
   return (
@@ -337,6 +373,7 @@ export function HistoryDashboard({
           title={t.historyMapTitle}
           subtitle={t.historyMapSubtitle}
           mode="history"
+          records={records}
           day={selected ? day : undefined}
         />
         <Calendar
@@ -500,13 +537,16 @@ export function RecentDashboard({
   const latest = Math.max(
     ...recentDetections.map((item) => new Date(item.acquiredAt).getTime()),
   );
-  const visible = recentDetections.filter((item) => {
+  const visible = recentDetections.filter((item, index) => {
     const withinSensor = sensor === "all" || item.sensor === sensor;
     const withinPeriod =
       new Date(item.acquiredAt).getTime() >= latest - period * 60 * 60 * 1000;
-    return withinSensor && withinPeriod;
+    return (
+      withinSensor && withinPeriod && (zone === 0 || index % 2 === zone - 1)
+    );
   });
-  const active = selected ?? visible[0] ?? null;
+  const active =
+    visible.find((item) => item.id === selected?.id) ?? visible[0] ?? null;
   const sensorLabel =
     active?.sensor === "MODIS" ? t.mapLabels.modis : t.mapLabels.viirs;
 
@@ -567,6 +607,7 @@ export function RecentDashboard({
           title={t.recentMapTitle}
           subtitle={t.recentMapSubtitle}
           mode="recent"
+          records={visible}
           sensor={sensor}
           onSelect={setSelected}
         />
