@@ -544,7 +544,7 @@ comprobar_opencode() {
   fi
 
   case "$version" in
-    2.*|*" 2."*) ;;
+    2.*|*" 2."*|*" v2."*) ;;
     *)
       error "La CLI encontrada no es compatible con CLI 2: $version"
       error "Binario: $candidato"
