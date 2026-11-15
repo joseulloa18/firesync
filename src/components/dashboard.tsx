@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { FireMap } from "./fire-map";
 import type { DemoDetection, DemoSensorFilter } from "@/content/map-demo";
 import { Calendar } from "./calendar";
+import { DataProvenance } from "./data-provenance";
 import { Icon, type IconName } from "./icon";
 import { dictionaries, type Locale } from "./messages";
+import { createSyntheticProvenance } from "@/lib/provenance";
 import {
   HISTORY_START_YEAR,
   MAP_SAMPLE_LIMIT,
@@ -870,6 +872,7 @@ export function RecentDashboard({
     visible.find((item) => item.id === selected?.id) ?? visible[0] ?? null;
   const sensorLabelText =
     active?.sensor === "MODIS" ? t.mapLabels.modis : t.mapLabels.viirs;
+  const provenance = createSyntheticProvenance(visible);
 
   return (
     <>
@@ -1032,6 +1035,8 @@ export function RecentDashboard({
           </div>
         </aside>
       </section>
+
+      <DataProvenance locale={locale} provenance={provenance} />
     </>
   );
 }
