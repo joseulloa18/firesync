@@ -43,7 +43,11 @@ test("assistant switches language and handles server failure", async ({
   );
   await page.getByLabel("Your message").fill("Explain this alert");
   await page.getByRole("button", { name: "Send", exact: true }).click();
-  await expect(page.getByRole("alert")).toContainText("Muse still needs");
+  await expect(
+    page
+      .getByRole("region", { name: "FireSync assistant", exact: true })
+      .getByRole("alert"),
+  ).toContainText("Muse still needs");
   await expect(
     page.getByRole("button", { name: "Send", exact: true }),
   ).toBeVisible();

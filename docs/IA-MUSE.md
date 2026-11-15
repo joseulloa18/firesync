@@ -227,30 +227,36 @@ y coordinación, según `AGENTS.md`; no se hace push ni merge desde esta sesión
 
 ### Evidencia local de esta entrega — 2026-11-15
 
-- `pnpm lint`: pasó (ESLint y Prettier). Se usó el binario local de pnpm porque
-  Corepack no pudo resolver `registry.npmjs.org`.
+- `pnpm install --frozen-lockfile`: completó los 429 paquetes con Corepack y
+  pnpm 10.32.1, sin cambios de dependencias ni lockfile. Se resolvieron los
+  bloqueos previos de red y paquetes del mapa.
+- `pnpm lint`: pasó (ESLint y Prettier).
 - `pnpm test`: **227 pruebas, 21 archivos**, todas pasando; 40 pruebas nuevas
   de IA. Cubren contrato Meta, fragmentación UTF-8/SSE, errores saneados,
   herramientas/política, sesiones ajenas, cuotas, cancelación, límites,
   fallback y transporte de auditoría/lecturas Supabase simulado.
-- TypeScript de los archivos de IA, la página, el layout modificado y sus
-  pruebas: pasó con una configuración temporal que extiende `tsconfig.json`.
-- `pnpm typecheck`: generación de rutas pasó; el chequeo global quedó bloqueado
-  por `maplibre-gl` no instalado y los tipos dependientes en `fire-map.tsx`.
-- `pnpm build --webpack`: bloqueado por los módulos CSS y worker de
-  `maplibre-gl` ausentes. La instalación congelada/offline recuperó 405 paquetes,
-  pero no pudo completar los paquetes del mapa; el intento de descarga falló
-  con `ENOTFOUND registry.npmmirror.com`. No se alteró el lockfile ni se sustituyó
-  ese paquete por una implementación ficticia.
-- E2E añadidas para escritorio/móvil e idiomas, **no ejecutadas**: el arranque
-  del servidor local fue denegado con `listen EPERM 127.0.0.1:3000`.
+- `pnpm typecheck`: pasó completo, incluida generación de tipos de rutas.
+- `pnpm build`: pasó con Turbopack, sin omitir TypeScript, en modo mock/demo.
+  Generó las páginas ES/EN y `/api/agent/chat`. No requiere invocar a Meta
+  durante la compilación.
+- `pnpm test:e2e --workers=2`: **32 casos pasando**, escritorio y móvil, incluidos
+  streaming demo del asistente, mensajes de error en inglés y navegación
+  existente. El selector de error del asistente se acotó a su región para no
+  confundirlo con el anunciador de rutas de Next.js. Estos casos usan mock;
+  no consumen tokens de Meta.
 - La migración SQL se entrega para revisión; **no aplicada ni validada contra
   PostgreSQL real** en esta sesión. Los tests de transporte simulado no se
   presentan como una prueba de RLS en una base de datos.
-- Smoke real de Meta: **pendiente de clave**. La comprobación de configuración
-  terminó con `META_CONFIG_REQUIRED` antes de hacer una llamada. El `.env.local`
-  local se preparó con la clave vacía, permisos `0600` y exclusión de Git.
+- Smoke real de Meta: **verificado** con `muse-spark-1.3`, autenticación aceptada,
+  respuesta mínima esperada y **63 tokens**. La clave se configuró localmente,
+  conserva permisos `0600` y está excluida de Git; no se publica su valor.
+- Turno real a través de `POST /api/agent/chat` en desarrollo: **HTTP 200**,
+  eventos `session`, `text_delta`, `tool` y `done`, llamada permitida a
+  `get_first_aid_guidance` y ningún evento de error. Consumo reportado por Meta:
+  **3711 tokens de entrada y 456 de salida**. La base de conocimiento estaba
+  vacía: esta prueba verifica transporte, bucle y política, no contenido clínico.
 
-Esta evidencia no acredita CI remota, conexión real a Meta/Supabase, despliegue
-ni aceptación científica. Repetir los checks bloqueados con dependencias y
-permisos disponibles antes de integrar/publicar.
+Esta evidencia no acredita CI remota, conexión de auditoría real a Supabase,
+despliegue ni aceptación científica. La migración y el job de retención siguen
+requiriendo revisión antes de habilitar Muse en producción. No se ejecutaron
+envíos ni se modificó la base de datos.
