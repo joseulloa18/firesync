@@ -160,6 +160,33 @@ ausencia de actividad ni una ingesta en la aplicación. Es una muestra de archiv
 estándar de agosto, no una consulta de actualidad de noviembre. No se guarda la
 clave, la URL autenticada ni el CSV observado en el repositorio.
 
+### Segunda comprobación real: VIIRS S-NPP NRT
+
+El operador compartió una segunda salida saneada con `status: "ok"` para
+`VIIRS_SNPP_NRT`. Un intento anterior devolvió `upstream_error`; la causa no
+quedó identificada y ese fallo no se reprodujo en el intento exitoso. No se
+atribuye a una clave incorrecta ni a una causa concreta sin evidencia.
+
+- Descarga: `2026-11-15T17:59:40.721Z`.
+- Producto: `VIIRS_SNPP_NRT`, `isNrt: true`.
+- Disponibilidad devuelta: `2026-08-01` a `2026-11-02`.
+- Consulta: `2026-11-02`, un día, bbox `[-70.9,18.6,-70.5,19]`.
+- Registros leídos/aceptados/rechazados: `0 / 0 / 0`.
+- SHA-256: `2b11a44667d05367ecf77651b95fd3d34c545c7ec154856094b91245e41ae697`.
+- `persisted: false`, adquisición máxima `null`, última ingesta `null`,
+  `dataThrough: null`, cobertura `not_assessed` y validación científica
+  `not_performed`.
+
+El rango disponible de esta respuesta termina trece días antes de la descarga.
+El consumidor debe mostrar ese corte y su antigüedad, sin etiquetar esta muestra
+como actualizada al 15 de noviembre. No se ha comprobado la causa del desfase
+ni que ese corte represente la disponibilidad global del servicio. El cero de
+esta zona/día no se extrapola a otros días, productos o regiones.
+
+Quedan comprobadas por el operador las consultas de disponibilidad y área para
+MODIS SP y VIIRS S-NPP NRT. Aún no existe una ingesta persistente, un historial
+observado en la UI ni validación científica del índice armonizado.
+
 Para revertir, revertir el commit de esta etapa. Como no hay cambios en DB,
 configuración, jobs ni UI, no es necesario borrar datos ni desactivar servicios.
 La persistencia idempotente, cobertura, reconciliación SP/NRT y endpoints de
