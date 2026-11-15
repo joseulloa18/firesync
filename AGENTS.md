@@ -121,3 +121,10 @@ kb/                      base de conocimiento curada para el agente (primeros au
 - Repositorio público: `https://github.com/joseulloa18/firesync`. No crear repositorios con Josezx18.
 - No publicar los correos del equipo. Usar únicamente sus usuarios de GitHub para coordinación.
 - Supabase FIRESYNC Free creado: proyecto `dsefxgrsdqydrvgdjhoc`. No aplicar SQL sin revisión; las credenciales se gestionan fuera del repo.
+
+## Distribución a estaciones — 2026-11-15
+
+- Inventario y cuentas públicas: `orquestacion/equipo.json`; instrucciones por miembro: `equipo/`.
+- El usuario autorizó que el lanzador publique automáticamente la rama de tarea y un PR en borrador después de comprobar commits, worktree limpio y `lint`, `typecheck`, `test`.
+- El agente LLM sigue sin ejecutar push ni merge. La publicación la realiza el lanzador con argumentos validados; la coordinación revisa antes de integrar a `main`.
+- Ninguna estación se considera conectada por haber descargado el kit: requiere primer arranque local, autenticación y resultado verificable.
