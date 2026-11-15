@@ -25,7 +25,8 @@ Nunca subas claves al repositorio. La configuración utilizada se valida con Zod
 `DEMO_MODE=false` exige las claves de Supabase, base de datos, FIRMS y cron y
 falla indicando los nombres ausentes sin imprimir valores secretos. Las variables
 reservadas para integraciones futuras están enumeradas en `.env.example`.
-Configurar claves todavía no conecta esas integraciones.
+Configurar claves no acredita una conexión verificada. El asistente dispone de
+un adaptador de Meta; las demás integraciones conservan sus límites descritos abajo.
 
 ```sh
 pnpm lint
@@ -66,9 +67,9 @@ no el caso científico definitivo pendiente de selección por el equipo.
 `lastIngestAt: null` y `email: "disabled"`. No prueba servicios externos ni
 confunde la configuración de credenciales con una conexión verificada.
 
-Mapa real, ingesta, armonización, autenticación, alertas, agente IA y respuesta
+Mapa real, ingesta, armonización, autenticación, alertas y respuesta
 operativa no están implementados en BASE. Las páginas de relleno explican estos
-límites; no se recopilan correos ni se envían mensajes. Hay estados de carga,
+límites; no se recopilan correos ni se envían avisos operativos. Hay estados de carga,
 error recuperable, datos ausentes y desconexión. Todo texto de interfaz procede
 de `messages/es.json` y `messages/en.json`.
 
@@ -79,6 +80,20 @@ el comando no estará disponible hasta integrarla. `ingest:backfill` y
 `stats:recompute` siguen terminando con error explícito de función pendiente.
 BASE por sí sola no acredita la Fase 0 completa ni habilita avanzar a fases
 operativas.
+
+### Asistente con Muse
+
+El enlace «Asistente FireSync» abre `/es/asistente` o `/en/asistente`. Sin claves
+usa una demostración guionizada, identificada como tal y sin llamadas a la red.
+Para la API directa de Meta, guardar `LLM_PROVIDER=meta`,
+`LLM_MODEL=muse-spark-1.3` y `LLM_API_KEY` en el `.env.local` del servidor.
+`DEMO_MODE=true` conserva los datos sintéticos aunque el modelo sea real.
+
+Incluye streaming, herramientas públicas validadas, política de solo lectura,
+límites y auditoría. En local el historial es temporal. En producción Muse exige
+almacenamiento Supabase y la migración de agente revisada; no se aplica al
+arrancar. Incidentes, envíos, rutas y planificación con efectos siguen pendientes.
+Configuración, prueba de conexión y alcance exacto en [docs/IA-MUSE.md](docs/IA-MUSE.md).
 
 Aplicación web para el reto **NASA Space Apps Challenge 2026: calendario armonizado de actividad de incendios**. Armoniza los registros de focos de incendio activos de los sensores MODIS y VIIRS (NASA FIRMS) en un calendario que permite ver patrones históricos, condiciones inusuales y períodos críticos dentro de un área de interés. Además añade monitoreo de zonas con alerta por correo, respuesta temprana con activos cercanos y un agente de IA de apoyo.
 

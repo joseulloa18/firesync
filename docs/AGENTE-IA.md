@@ -1,5 +1,11 @@
 # Agente de IA
 
+Estado de implementación de la primera entrega: [`IA-MUSE.md`](IA-MUSE.md).
+Incluye `support-chat` con Meta Model API y mock, SSE, política de lectura,
+auditoría y migración pendiente de revisión/aplicación. Las capacidades con
+efectos y perfiles de coordinación/planificación descritos abajo conservan sus
+dependencias; esta entrega no declara completada toda la Fase 8.
+
 El agente es una capa que usa la API de un modelo de lenguaje, **independiente del proveedor**, con acceso a herramientas del backend. No decide solo sobre cosas irreversibles: opera dentro de políticas, registra todo y respeta la aprobación humana donde corresponde.
 
 ## 1. Capacidades

@@ -1,0 +1,109 @@
+.agent-launcher {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 50;
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  border: 1px solid #713113;
+  border-radius: 999px;
+  background: #803714;
+  color: #fff;
+  padding: 0.7rem 1.1rem;
+  box-shadow: 0 3px 15px #34251926;
+  font-weight: 650;
+  text-decoration: none;
+}
+.agent-launcher:focus-visible,
+.agent-chat :focus-visible {
+  outline: 3px solid #154e70;
+  outline-offset: 4px;
+}
+.agent-chat {
+  width: 100%;
+  max-width: 54rem;
+  margin: 0 auto 5rem;
+  border: 1px solid #cbbdaa;
+  border-radius: 1rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  background: #fffdf8;
+  color: #30291f;
+}
+.agent-notice {
+  border-left: 4px solid #a94215;
+  background: #fff0dc;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+.agent-mode,
+.agent-hint,
+.agent-status {
+  font-size: 0.85rem;
+  color: #635342;
+  margin: 0.75rem 0;
+}
+.agent-transcript {
+  min-height: 12rem;
+  max-height: 50vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.5rem 0;
+}
+.agent-empty {
+  padding: 2rem 1rem;
+  color: #635342;
+}
+.agent-message {
+  padding: 0.9rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 0.65rem;
+  overflow-wrap: anywhere;
+}
+.agent-message-user {
+  margin-left: 1rem;
+  background: #f3e6d7;
+}
+.agent-message-assistant {
+  margin-right: 1rem;
+  background: #f1f3ed;
+}
+.agent-message strong {
+  font-size: 0.8rem;
+}
+.agent-message p {
+  margin: 0.3rem 0 0;
+  white-space: pre-wrap;
+}
+.agent-error {
+  border: 1px solid #923717;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  color: #7c2c14;
+}
+.agent-form {
+  display: grid;
+  gap: 0.5rem;
+}
+.agent-form label {
+  font-weight: 650;
+}
+.agent-form textarea {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #9d8f7a;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  resize: vertical;
+  background: #fff;
+  color: #30291f;
+  font: inherit;
+}
+.agent-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.agent-chat button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
