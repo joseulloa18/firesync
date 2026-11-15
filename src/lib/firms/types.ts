@@ -1,6 +1,6 @@
-export type SensorFamily = 'MODIS' | 'VIIRS';
+export type SensorFamily = "MODIS" | "VIIRS";
 
-export type ConfidenceClass = 'low' | 'nominal' | 'high';
+export type ConfidenceClass = "low" | "nominal" | "high";
 
 export interface Bbox {
   west: number;
@@ -34,23 +34,23 @@ export interface FirmsDetection {
   brightness2: number | null;
   scan: number | null;
   track: number | null;
-  daynight: 'D' | 'N' | null;
+  daynight: "D" | "N" | null;
   version: string | null;
   type: string | null;
   isNrt: boolean;
 }
 
 export type CsvRowErrorCode =
-  | 'missing_required_value'
-  | 'invalid_date'
-  | 'invalid_time'
-  | 'invalid_latitude'
-  | 'invalid_longitude'
-  | 'invalid_confidence'
-  | 'invalid_number'
-  | 'unknown_satellite'
-  | 'satellite_product_mismatch'
-  | 'outside_bbox';
+  | "missing_required_value"
+  | "invalid_date"
+  | "invalid_time"
+  | "invalid_latitude"
+  | "invalid_longitude"
+  | "invalid_confidence"
+  | "invalid_number"
+  | "unknown_satellite"
+  | "satellite_product_mismatch"
+  | "outside_bbox";
 
 export interface CsvRowError {
   line: number;
@@ -74,21 +74,15 @@ export interface CsvParseResult {
 
 export class FirmsCsvError extends Error {
   readonly code:
-    | 'empty_csv'
-    | 'missing_header'
-    | 'unknown_source'
-    | 'unterminated_quote';
+    "empty_csv" | "missing_header" | "unknown_source" | "unterminated_quote";
 
   constructor(
     code:
-      | 'empty_csv'
-      | 'missing_header'
-      | 'unknown_source'
-      | 'unterminated_quote',
+      "empty_csv" | "missing_header" | "unknown_source" | "unterminated_quote",
     message: string,
   ) {
     super(message);
-    this.name = 'FirmsCsvError';
+    this.name = "FirmsCsvError";
     this.code = code;
   }
 }

@@ -1,11 +1,11 @@
-import { selectSeriesDetections } from './filters';
+import { selectSeriesDetections } from "./filters";
 import type {
   CellMonth,
   GriddedDetection,
   MonthlyFamilyTotals,
   MonthlySensorTotals,
   SeriesSelectionOptions,
-} from './types';
+} from "./types";
 
 interface DateParts {
   year: number;
@@ -35,10 +35,7 @@ export function computeCellMonth(
   options: SeriesSelectionOptions = {},
 ): CellMonth[] {
   const selected = selectSeriesDetections(detections, options);
-  const groups = new Map<
-    string,
-    { row: CellMonth; days: Set<string> }
-  >();
+  const groups = new Map<string, { row: CellMonth; days: Set<string> }>();
 
   for (const detection of selected) {
     const { year, month } = dateParts(detection.acqDate);
@@ -135,17 +132,16 @@ export function combineMonthlyFamilyTotals(
   for (const total of totals) {
     const key = `${total.year}|${total.month}`;
     const existing = groups.get(key);
-    const row: MonthlyFamilyTotals =
-      existing ?? {
-        year: total.year,
-        month: total.month,
-        modisCellDays: null,
-        viirsCellDays: null,
-        detectionsModis: null,
-        detectionsViirs: null,
-      };
+    const row: MonthlyFamilyTotals = existing ?? {
+      year: total.year,
+      month: total.month,
+      modisCellDays: null,
+      viirsCellDays: null,
+      detectionsModis: null,
+      detectionsViirs: null,
+    };
 
-    if (total.sensor === 'MODIS') {
+    if (total.sensor === "MODIS") {
       row.modisCellDays = total.cellDays;
       row.detectionsModis = total.nDetections;
     } else {
@@ -170,5 +166,7 @@ export function computeMonthlyFamilyTotals(
   detections: readonly GriddedDetection[],
   options: SeriesSelectionOptions = {},
 ): MonthlyFamilyTotals[] {
-  return combineMonthlyFamilyTotals(computeMonthlySensorTotals(detections, options));
+  return combineMonthlyFamilyTotals(
+    computeMonthlySensorTotals(detections, options),
+  );
 }

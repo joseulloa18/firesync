@@ -3,7 +3,7 @@ import type {
   ConfidenceClass,
   FirmsDetection,
   SensorFamily,
-} from '../firms/types';
+} from "../firms/types";
 
 export interface GriddedDetection extends FirmsDetection {
   cellId: number;
@@ -66,11 +66,7 @@ export interface DedupeResult<T> {
 }
 
 export type MonthStatus =
-  | 'below_usual'
-  | 'usual'
-  | 'above_usual'
-  | 'exceptional'
-  | 'insufficient';
+  "below_usual" | "usual" | "above_usual" | "exceptional" | "insufficient";
 
 export interface ReferenceObservation {
   year: number;

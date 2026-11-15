@@ -1,6 +1,6 @@
-import type { FirmsDetection } from '../firms/types';
-import { CELL_SIZE_DEGREES, GRID_HEIGHT, GRID_WIDTH } from './config';
-import type { GridCell, GriddedDetection } from './types';
+import type { FirmsDetection } from "../firms/types";
+import { CELL_SIZE_DEGREES, GRID_HEIGHT, GRID_WIDTH } from "./config";
+import type { GridCell, GriddedDetection } from "./types";
 
 const MAX_CELL_ID = GRID_WIDTH * GRID_HEIGHT - 1;
 
@@ -51,7 +51,7 @@ export function cellCentroid(cellOrId: GridCell | number): {
   latitude: number;
 } {
   const cell =
-    typeof cellOrId === 'number' ? cellIdToGridCell(cellOrId) : cellOrId;
+    typeof cellOrId === "number" ? cellIdToGridCell(cellOrId) : cellOrId;
   return {
     longitude: roundCoordinate(-180 + (cell.ix + 0.5) * CELL_SIZE_DEGREES),
     latitude: roundCoordinate(-90 + (cell.iy + 0.5) * CELL_SIZE_DEGREES),
@@ -65,7 +65,7 @@ export function cellBounds(cellOrId: GridCell | number): {
   north: number;
 } {
   const cell =
-    typeof cellOrId === 'number' ? cellIdToGridCell(cellOrId) : cellOrId;
+    typeof cellOrId === "number" ? cellIdToGridCell(cellOrId) : cellOrId;
   const west = roundCoordinate(-180 + cell.ix * CELL_SIZE_DEGREES);
   const south = roundCoordinate(-90 + cell.iy * CELL_SIZE_DEGREES);
   return {

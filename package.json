@@ -1,0 +1,44 @@
+{
+  "name": "firesync",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:db": "node --test \"tests/db/**/*.test.mjs\"",
+    "test:e2e": "playwright test",
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "ingest:backfill": "node -e \"console.error('Pending: ingestion is outside BASE scope');process.exit(1)\"",
+    "stats:recompute": "node -e \"console.error('Pending: harmonization is outside BASE scope');process.exit(1)\""
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "pg": "^8.23.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "prettier": "^3.6.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.0"
+  }
+}
