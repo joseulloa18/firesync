@@ -10,7 +10,6 @@ import { dictionaries, type Locale } from "./messages";
 import { createSyntheticProvenance } from "@/lib/provenance";
 import {
   HISTORY_START_YEAR,
-  MAP_SAMPLE_LIMIT,
   countBySensor,
   createMonthRecords,
   createMonthSummary,
@@ -19,7 +18,6 @@ import {
   defaultHistoryRange,
   filterHistoryRecords,
   historyYearOptions,
-  sampleForMap,
   utcDayOf,
   type HistoryMonthSelection,
   type HistoryMonthSummary,
@@ -561,13 +559,8 @@ export function HistoryDashboard({
     () => filterHistoryRecords(periodRecords, sensor),
     [periodRecords, sensor],
   );
-  const mapRecords = selected
-    ? filteredMonthRecords
-    : sampleForMap(filteredPeriodRecords, MAP_SAMPLE_LIMIT);
-  const sampleNote =
-    !selected && filteredPeriodRecords.length > mapRecords.length
-      ? `${t.mapSampleNote} (${mapRecords.length}/${filteredPeriodRecords.length})`
-      : undefined;
+  const mapRecords = selected ? filteredMonthRecords : filteredPeriodRecords;
+
   const activeDay = day ?? 1;
   const dayRecords = useMemo(
     () =>
@@ -713,7 +706,6 @@ export function HistoryDashboard({
           records={mapRecords}
           onSensorChange={setSensor}
           activity
-          sampleNote={sampleNote}
         />
         <Calendar
           locale={locale}

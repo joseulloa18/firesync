@@ -86,20 +86,13 @@ registros filtrados que recibe, sin otro generador ni truncado oculto.
 
 ## Límite de puntos en el mapa
 
-La vista de período puede abarcar 27 años y decenas de miles de registros. Para
-no crear decenas de miles de marcadores DOM, la lista que recibe el mapa se
-reduce a `MAP_SAMPLE_LIMIT = 500` registros mediante `sampleForMap`, una muestra
-determinista y ordenada que nunca inventa puntos. Cuando se aplica, la interfaz
-muestra un aviso con la proporción (`mostrados/total`).
+El mapa recibe TODOS los registros del filtro. La capa espacial agrega la lista
+completa y conserva el total, al igual que cifras, detalle diario y CSV.
 
-Las **cifras, el detalle diario y el CSV conservan todos los registros** del
-filtro; el muestreo afecta únicamente a la representación de puntos. Cuando hay
-un mes abierto, el mapa usa el mes filtrado completo (sin muestreo de período)
-y se limita al día seleccionado.
-
-> Nota de integración: la capa GeoJSON agregada del mapa es trabajo del issue
-> #22. Hasta que se integre, este límite es la protección explícita acordada en
-> el contrato.
+Solo los marcadores DOM y su lista de representación se limitan internamente
+a 250 puntos en FireMap, con el conteo mostrado/total. El límite no se aplica
+antes de construir la capa de intensidad. En detalle se filtra también el día
+seleccionado, sin otra generación de registros.
 
 ## CSV sintético
 
