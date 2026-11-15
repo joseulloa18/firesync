@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "resources": [
+    {
+      "id": "mmarn-temporada-prevencion-incendios-forestales-2026",
+      "title": "Queda iniciada la Temporada de Prevención de Incendios Forestales 2026",
+      "organization": "Ministerio de Medio Ambiente y Recursos Naturales (MMARN)",
+      "category": "prevention",
+      "url": "https://ambiente.gob.do/queda-iniciada-la-temporada-de-prevencion-de-incendios-forestales-2026/",
+      "regionCode": "DO",
+      "publishedAt": "2026-02-14",
+      "checkedAt": "2026-11-15T16:12:28Z",
+      "reviewStatus": "verified_source",
+      "notes": "Nota oficial sobre el inicio de la campaña nacional de prevención. Describe acciones de prevención y respuesta; no confirma incendios activos ni sustituye al 9-1-1.",
+      "is_demo": false
+    },
+    {
+      "id": "mmarn-refuerza-prevencion-incendios-forestales-2026",
+      "title": "Medio Ambiente refuerza la estrategia nacional de prevención ante el incremento de incendios forestales",
+      "organization": "Ministerio de Medio Ambiente y Recursos Naturales (MMARN)",
+      "category": "prevention",
+      "url": "https://ambiente.gob.do/medio-ambiente-refuerza-prevencion-incendios-forestales/",
+      "regionCode": "DO",
+      "publishedAt": "2026-07-31",
+      "checkedAt": "2026-11-15T16:12:28Z",
+      "reviewStatus": "verified_source",
+      "notes": "Nota oficial sobre vigilancia, coordinación institucional y reporte de columnas de humo. Es contenido de prevención, no un parte de incidentes.",
+      "is_demo": false
+    },
+    {
+      "id": "defensa-civil-incendio-forestal",
+      "title": "Incendio Forestal",
+      "organization": "Defensa Civil Dominicana",
+      "category": "prevention",
+      "url": "https://www.defensacivil.gob.do/index.php/incendio-forestal",
+      "regionCode": "DO",
+      "publishedAt": null,
+      "checkedAt": "2026-11-15T16:12:28Z",
+      "reviewStatus": "verified_source",
+      "notes": "Página con la sección «¿Qué hacer en caso de incendio forestal?» y recomendaciones de prevención y autoprotección. La página no muestra fecha de publicación verificable.",
+      "is_demo": false
+    },
+    {
+      "id": "911-como-usarlo",
+      "title": "¿CÓMO USARLO?",
+      "organization": "Sistema Nacional de Atención a Emergencias y Seguridad 9-1-1",
+      "category": "reporting",
+      "url": "https://911.gob.do/como-usarlo/",
+      "regionCode": "DO",
+      "publishedAt": null,
+      "checkedAt": "2026-11-15T16:12:28Z",
+      "reviewStatus": "verified_source",
+      "notes": "Explica cómo funciona el 9-1-1 e incluye al Cuerpo de Bomberos entre las instituciones de respuesta. La página declara cobertura nacional parcial (aproximadamente 91.7 % de la población). Es el canal de emergencia verificado; no es un formulario específico de incendios forestales.",
+      "is_demo": false
+    },
+    {
+      "id": "mmarn-denuncias-ambientales",
+      "title": "Denuncias Ambientales",
+      "organization": "Ministerio de Medio Ambiente y Recursos Naturales (MMARN)",
+      "category": "reporting",
+      "url": "https://ambiente.gob.do/denuncias-ambientales/",
+      "regionCode": "DO",
+      "publishedAt": null,
+      "checkedAt": "2026-11-15T16:12:28Z",
+      "reviewStatus": "verified_source",
+      "notes": "Página oficial de denuncias ambientales del MMARN. Publica sus canales de contacto; el catálogo no los transcribe para evitar datos duplicados o desactualizados. Es un canal de denuncias, no una línea de emergencia.",
+      "is_demo": false
+    },
+    {
+      "id": "linea-verde-rd",
+      "title": "Realiza tus denuncias medio ambientales en Línea Verde",
+      "organization": "Ministerio de Medio Ambiente y Recursos Naturales (MMARN)",
+      "category": "reporting",
+      "url": "https://lineaverde.gob.do/",
+      "regionCode": "DO",
+      "publishedAt": null,
+      "checkedAt": "2026-11-15T16:12:28Z",
+      "reviewStatus": "verified_source",
+      "notes": "Sitio oficial de Línea Verde con formulario público de denuncias ambientales y consulta de seguimiento. Es un canal de denuncias, no una línea de emergencia.",
+      "is_demo": false
+    },
+    {
+      "id": "mmarn-noticias",
+      "title": "Noticias",
+      "organization": "Ministerio de Medio Ambiente y Recursos Naturales (MMARN)",
+      "category": "bulletins",
+      "url": "https://ambiente.gob.do/noticias/",
+      "regionCode": "DO",
+      "publishedAt": null,
+      "checkedAt": "2026-11-15T16:12:28Z",
+      "reviewStatus": "verified_source",
+      "notes": "Índice de la sala de prensa del MMARN. Incluye temas ambientales diversos y no confirma incendios por sí solo; cada nota debe leerse en su fuente con fecha y territorio.",
+      "is_demo": false
+    },
+    {
+      "id": "coe-boletines",
+      "title": "BOLETINES",
+      "organization": "Centro de Operaciones de Emergencias (COE)",
+      "category": "bulletins",
+      "url": "https://www.coe.gob.do/index.php/documentos-descargas/category/186-boletines",
+      "regionCode": "DO",
+      "publishedAt": null,
+      "checkedAt": "2026-11-15T16:12:28Z",
+      "reviewStatus": "verified_source",
+      "notes": "Listado de boletines operativos del COE (en la revisión, sobre Semana Santa 2026). Son boletines generales de emergencias, no un feed específico de incendios forestales; verificar la vigencia de cada boletín antes de mostrarlo.",
+      "is_demo": false
+    },
+    {
+      "id": "mmarn-estrategia-nacional-manejo-fuego-2016-2025",
+      "title": "Estrategia Nacional de Manejo del Fuego 2016-2025",
+      "organization": "Ministerio de Medio Ambiente y Recursos Naturales (MMARN)",
+      "category": "prevention",
+      "url": "https://sinia.ambiente.gob.do/documentacion/descarga/mmarn-estrategiafuego-2016/ESTRATEGIA-NACIONAL-MANEJO-DE-FUEGO-RD-2016-2025.pdf",
+      "regionCode": "DO",
+      "publishedAt": null,
+      "checkedAt": "2026-11-15T16:12:28Z",
+      "reviewStatus": "pending",
+      "notes": "Candidato pendiente: el PDF responde HTTP 200 con tipo application/pdf, pero en esta revisión no se pudo comprobar su texto visible. El título se toma del nombre del archivo. No presentar como recurso oficial revisado hasta que una persona abra y valide el documento.",
+      "is_demo": false
+    }
+  ]
+}
