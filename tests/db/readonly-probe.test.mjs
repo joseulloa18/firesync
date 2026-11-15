@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { Client } from "pg";
 import test from "node:test";
 import {
@@ -380,9 +380,14 @@ test(
   "catalogue SQL runs read-only against ephemeral PostGIS in CI",
   { skip: !ephemeralUrl },
   async () => {
-    const filename = "20261114000100_initial_core.sql";
-    const expected = [
-      {
+    const directory = new globalThis.URL(
+      "../../supabase/migrations/",
+      import.meta.url,
+    );
+    const expected = readdirSync(directory)
+      .filter((filename) => filename.endsWith(".sql"))
+      .sort()
+      .map((filename) => ({
         version: filename.slice(0, -4),
         checksum: createHash("sha256")
           .update(
@@ -394,8 +399,7 @@ test(
             ),
           )
           .digest("hex"),
-      },
-    ];
+      }));
     const result = await probeReadonlyDatabase({
       databaseUrl: URL,
       expectedMigrations: expected,
@@ -410,7 +414,7 @@ test(
         });
       },
     });
-    assert.equal(result.schemaReady, true);
+    assert.equal(result.schemaReady, true, JSON.stringify(result));
     assert.equal(result.written, false);
   },
 );
