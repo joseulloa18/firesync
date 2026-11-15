@@ -8,7 +8,7 @@
  * catálogo validado los marca como revisados y vigentes.
  */
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { Icon, type IconName } from "./icon";
 import { dictionaries, type Locale } from "./messages";
 import {
@@ -26,6 +26,10 @@ import {
   type ResponseContext,
   type ResponseDetectionContext,
 } from "@/lib/resources/official-resources";
+
+const subscribeToHydration = () => () => {};
+const clientIsReady = () => true;
+const serverIsReady = () => false;
 import "./prevention-response.css";
 
 type Dict = (typeof dictionaries)[Locale];
@@ -286,6 +290,12 @@ export function PreventionResponseView({
 }) {
   const t = dictionaries[locale];
   const p = t.preventionResponse;
+  // Keep the server-rendered selector inactive until React can handle changes.
+  const hydrated = useSyncExternalStore(
+    subscribeToHydration,
+    clientIsReady,
+    serverIsReady,
+  );
   const now = useMemo(() => new Date(today), [today]);
   const [zoneIndex, setZoneIndex] = useState(() => {
     const index = context.zone ? DEMO_ZONE_IDS.indexOf(context.zone) : 0;
@@ -393,6 +403,7 @@ export function PreventionResponseView({
           <label className="field">
             <span>{t.filterZone}</span>
             <select
+              disabled={!hydrated}
               value={zoneId}
               onChange={(event) => handleZoneChange(event.target.value)}
               data-testid="zone-select"

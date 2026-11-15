@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { AgentError, type ChatMessage, type TokenUsage } from "./llm";
 import type { AuditStore, OpenTurn, RunInfo, ToolAudit } from "./audit";
+import { supabaseHeaders } from "./supabase-headers";
 
 const runSchema = z.object({
   id: z.uuid(),
@@ -36,8 +37,7 @@ export class SupabaseAuditStore implements AuditStore {
         {
           method,
           headers: {
-            apikey: this.key,
-            Authorization: `Bearer ${this.key}`,
+            ...supabaseHeaders(this.key),
             "Content-Type": "application/json",
             Prefer: "return=minimal",
           },

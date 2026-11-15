@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { z } from "zod";
 import { mapDemoDetections } from "@/content/map-demo";
 import { AgentError, type ToolDefinition } from "./llm";
+import { supabaseHeaders } from "./supabase-headers";
 
 export type Actor = { role: "anonymous" | "user" | "coordinator" | "admin" };
 export type AgentTool = {
@@ -103,10 +104,7 @@ export class PublicDataSource {
       const response = await this.fetcher(
         `${this.url.replace(/\/$/, "")}/rest/v1/${table}?${query}`,
         {
-          headers: {
-            apikey: this.anonKey,
-            Authorization: `Bearer ${this.anonKey}`,
-          },
+          headers: supabaseHeaders(this.anonKey),
           signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
           redirect: "error",
           cache: "no-store",
