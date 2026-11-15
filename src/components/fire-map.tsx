@@ -139,6 +139,7 @@ export function FireMap({
       let maplibre: MapModule;
       try {
         maplibre = await import("maplibre-gl");
+        maplibre.setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).toString());
       } catch {
         if (!cancelled) setStatus("error");
         return;
